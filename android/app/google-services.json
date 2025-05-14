@@ -12,7 +12,20 @@
           "package_name": "com.example.homepass"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "711035505656-pd23n9gm11utr4jofm5r2hcsjma26bnh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.homepass",
+            "certificate_hash": "f2b021a3edb34ad4b6a2cca0784227cbd43ec63f"
+          }
+        },
+        {
+          "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAXUdevDEfprPIvNLf-UHVO0rgpUsr84lY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

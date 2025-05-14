@@ -50,6 +50,9 @@ dependencies {
     
     // Add Firebase Auth
     implementation("com.google.firebase:firebase-auth")
+    
+    // Add Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 }
 
 flutter {

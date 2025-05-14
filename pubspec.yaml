@@ -36,15 +36,20 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # Firebase
-  firebase_core:
-  firebase_auth:
+  firebase_core: 
+  firebase_auth: 
+  cloud_firestore: 
+  firebase_storage: 
+  firebase_messaging: 
+  firebase_analytics: 
+  google_sign_in: 
   
   # State Management
-  flutter_riverpod:
+  flutter_riverpod: 
   
   # UI Components
-  google_fonts:
-  flutter_spinkit:
+  google_fonts: 
+  flutter_spinkit: 
 
 dev_dependencies:
   flutter_test:
