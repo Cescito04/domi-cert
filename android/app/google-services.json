@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "711035505656",
+    "project_id": "homepass-711ce",
+    "storage_bucket": "homepass-711ce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711035505656:android:ec0a317e41c5811053a40d",
+        "android_client_info": {
+          "package_name": "com.example.homepass"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXUdevDEfprPIvNLf-UHVO0rgpUsr84lY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
