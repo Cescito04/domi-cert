@@ -1,28 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/quartier.dart';
 import '../services/quartier_service.dart';
 
-class QuartiersScreen extends StatefulWidget {
+final quartierServiceProvider = Provider((ref) => QuartierService());
+
+class QuartiersScreen extends ConsumerStatefulWidget {
   const QuartiersScreen({super.key});
 
   @override
-  State<QuartiersScreen> createState() => _QuartiersScreenState();
+  ConsumerState<QuartiersScreen> createState() => _QuartiersScreenState();
 }
 
-class _QuartiersScreenState extends State<QuartiersScreen> {
-  final QuartierService _quartierService = QuartierService();
-  final TextEditingController _nomController = TextEditingController();
+class _QuartiersScreenState extends ConsumerState<QuartiersScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _nomController = TextEditingController();
+  final _descriptionController = TextEditingController();
   Quartier? _quartierToEdit;
 
   @override
   void dispose() {
     _nomController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
   void _showQuartierDialog([Quartier? quartier]) {
     _quartierToEdit = quartier;
     _nomController.text = quartier?.nom ?? '';
+    _descriptionController.text = quartier?.description ?? '';
 
     showDialog(
       context: context,
@@ -46,8 +52,8 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                     ),
                     child: Icon(
                       quartier == null
-                          ? Icons.add_location_alt
-                          : Icons.edit_location_alt,
+                          ? Icons.add_location
+                          : Icons.edit_location,
                       size: 32,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -61,19 +67,54 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  TextField(
-                    controller: _nomController,
-                    decoration: InputDecoration(
-                      labelText: 'Nom du quartier',
-                      hintText: 'Entrez le nom du quartier',
-                      prefixIcon: const Icon(Icons.location_city_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _nomController,
+                          decoration: InputDecoration(
+                            labelText: 'Nom',
+                            hintText: 'Entrez le nom du quartier',
+                            prefixIcon: const Icon(
+                              Icons.location_city_outlined,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez entrer un nom';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _descriptionController,
+                          decoration: InputDecoration(
+                            labelText: 'Description',
+                            hintText: 'Entrez la description du quartier',
+                            prefixIcon: const Icon(Icons.description_outlined),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                          ),
+                          maxLines: 3,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez entrer une description';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
                     ),
-                    autofocus: true,
                   ),
                   const SizedBox(height: 24),
                   Row(
@@ -86,12 +127,22 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () async {
-                          if (_nomController.text.isNotEmpty) {
+                          if (_formKey.currentState!.validate()) {
                             try {
-                              if (quartier == null) {
-                                await _quartierService.createQuartier(
-                                  _nomController.text,
-                                );
+                              final quartier = Quartier(
+                                id:
+                                    _quartierToEdit?.id ??
+                                    DateTime.now().millisecondsSinceEpoch
+                                        .toString(),
+                                nom: _nomController.text,
+                                description: _descriptionController.text,
+                                userId: _quartierToEdit?.userId ?? '',
+                              );
+
+                              if (_quartierToEdit == null) {
+                                await ref
+                                    .read(quartierServiceProvider)
+                                    .createQuartier(quartier);
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -116,10 +167,9 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                                   );
                                 }
                               } else {
-                                await _quartierService.updateQuartier(
-                                  quartier.id,
-                                  _nomController.text,
-                                );
+                                await ref
+                                    .read(quartierServiceProvider)
+                                    .updateQuartier(quartier);
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -195,8 +245,8 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
     );
   }
 
-  Future<void> _deleteQuartier(Quartier quartier) async {
-    final confirmed = await showDialog<bool>(
+  void _deleteQuartier(Quartier quartier) {
+    showDialog(
       context: context,
       builder:
           (context) => Dialog(
@@ -225,9 +275,9 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                     'Confirmer la suppression',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
                   Text(
-                    'Voulez-vous vraiment supprimer le quartier "${quartier.nom}" ?',
+                    'Êtes-vous sûr de vouloir supprimer le quartier "${quartier.nom}" ?',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
@@ -236,12 +286,65 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () => Navigator.pop(context, false),
+                        onPressed: () => Navigator.pop(context),
                         child: const Text('Annuler'),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
-                        onPressed: () => Navigator.pop(context, true),
+                        onPressed: () async {
+                          try {
+                            await ref
+                                .read(quartierServiceProvider)
+                                .deleteQuartier(quartier.id);
+                            if (mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        'Quartier supprimé avec succès',
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.error_outline,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text('Erreur: ${e.toString()}'),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           foregroundColor: Colors.white,
@@ -262,49 +365,6 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
             ),
           ),
     );
-
-    if (confirmed == true) {
-      try {
-        await _quartierService.deleteQuartier(quartier.id);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 8),
-                  const Text('Quartier supprimé avec succès'),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.white),
-                  const SizedBox(width: 8),
-                  Text('Erreur: ${e.toString()}'),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
-        }
-      }
-    }
   }
 
   @override
@@ -330,29 +390,22 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
           ),
         ),
         child: StreamBuilder<List<Quartier>>(
-          stream: _quartierService.getQuartiers(),
+          stream: ref.read(quartierServiceProvider).getQuartiers(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 48, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Erreur: ${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ],
+                child: Text(
+                  'Erreur: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red),
                 ),
               );
             }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final quartiers = snapshot.data ?? [];
+            final quartiers = snapshot.data!;
 
             if (quartiers.isEmpty) {
               return Center(
@@ -366,25 +419,14 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Aucun quartier trouvé',
+                      'Aucun quartier enregistré',
                       style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: () => _showQuartierDialog(),
                       icon: const Icon(Icons.add),
                       label: const Text('Ajouter un quartier'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -397,26 +439,22 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
               itemBuilder: (context, index) {
                 final quartier = quartiers[index];
                 return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
+                    contentPadding: const EdgeInsets.all(16),
                     leading: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Theme.of(
                           context,
                         ).colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.location_city_outlined,
+                        Icons.location_city,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -427,20 +465,44 @@ class _QuartiersScreenState extends State<QuartiersScreen> {
                         fontSize: 16,
                       ),
                     ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined),
-                          onPressed: () => _showQuartierDialog(quartier),
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _deleteQuartier(quartier),
-                          color: Colors.red,
-                        ),
-                      ],
+                    subtitle: Text(
+                      quartier.description,
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    trailing: PopupMenuButton(
+                      itemBuilder:
+                          (context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit),
+                                  SizedBox(width: 8),
+                                  Text('Modifier'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Supprimer',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                      onSelected: (value) {
+                        if (value == 'edit') {
+                          _showQuartierDialog(quartier);
+                        } else if (value == 'delete') {
+                          _deleteQuartier(quartier);
+                        }
+                      },
                     ),
                   ),
                 );
