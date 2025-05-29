@@ -36,13 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # Firebase
-  firebase_core: 
-  firebase_auth: 
-  cloud_firestore: 
-  firebase_storage: 
-  firebase_messaging: 
-  firebase_analytics: 
-  google_sign_in: 
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_storage: ^11.5.6
+  firebase_messaging: ^14.7.9
+  firebase_analytics: ^10.7.4
+  google_sign_in: ^6.1.6
+  firebase_ui_auth: ^1.11.1
   
   # State Management
   flutter_riverpod: 

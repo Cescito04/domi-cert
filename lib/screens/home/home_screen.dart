@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:homepass/services/auth_service.dart';
+import 'package:homepass/screens/quartiers_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -151,7 +152,12 @@ class HomeScreen extends ConsumerWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () {
-          // TODO: Implémenter la navigation vers la fonctionnalité
+          if (title == 'Quartiers') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const QuartiersScreen()),
+            );
+          }
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
