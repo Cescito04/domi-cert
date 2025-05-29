@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homepass/screens/auth/login_screen.dart';
+import 'package:homepass/screens/auth/register_screen.dart';
+import 'package:homepass/screens/auth/google_signin_phone_screen.dart';
 import 'package:homepass/screens/home/home_screen.dart';
 import 'package:homepass/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -84,6 +86,15 @@ class MyApp extends ConsumerWidget {
           ),
         ),
       ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E88E5),
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
+      ),
+      themeMode: ThemeMode.system,
       home: authState.when(
         data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
         loading:
@@ -94,6 +105,25 @@ class MyApp extends ConsumerWidget {
             (error, stack) =>
                 Scaffold(body: Center(child: Text('Erreur: $error'))),
       ),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/google-signin-phone') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder:
+                (context) => GoogleSignInPhoneScreen(
+                  user: args['user'],
+                  displayName: args['displayName'],
+                  email: args['email'],
+                ),
+          );
+        }
+        return null;
+      },
     );
   }
 }
