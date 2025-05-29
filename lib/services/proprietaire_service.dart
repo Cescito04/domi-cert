@@ -50,4 +50,12 @@ class ProprietaireService {
       throw Exception('Erreur lors de la vérification du propriétaire: $e');
     }
   }
+
+  Stream<List<Proprietaire>> getProprietaires() {
+    return _proprietairesCollection.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Proprietaire.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    });
+  }
 }

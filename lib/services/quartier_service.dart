@@ -60,4 +60,16 @@ class QuartierService {
       throw Exception('Erreur lors de la création du quartier de test: $e');
     }
   }
+
+  Future<Quartier?> getQuartier(String id) async {
+    try {
+      final doc = await _quartiersCollection.doc(id).get();
+      if (doc.exists) {
+        return Quartier.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération du quartier: $e');
+    }
+  }
 }
