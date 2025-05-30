@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/proprietaire.dart';
 import '../../services/proprietaire_service.dart';
 
@@ -40,6 +39,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               password: _passwordController.text,
             );
 
+        await userCredential.user?.updateDisplayName(
+          _nomController.text.trim(),
+        );
+
         final proprietaire = Proprietaire(
           id: userCredential.user!.uid,
           nom: _nomController.text.trim(),
@@ -48,6 +51,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         await _proprietaireService.createProprietaire(proprietaire);
+
+        await userCredential.user?.updateProfile(
+          displayName: _nomController.text.trim(),
+          photoURL: null,
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

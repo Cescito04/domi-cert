@@ -7,7 +7,6 @@ class QuartierService {
       .collection('quartiers');
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Créer un nouveau quartier
   Future<void> createQuartier(Quartier quartier) async {
     try {
       final user = _auth.currentUser;
@@ -47,7 +46,6 @@ class QuartierService {
     }
   }
 
-  // Mettre à jour un quartier
   Future<void> updateQuartier(Quartier quartier) async {
     try {
       final user = _auth.currentUser;
@@ -65,7 +63,6 @@ class QuartierService {
     }
   }
 
-  // Supprimer un quartier
   Future<void> deleteQuartier(String id) async {
     try {
       final user = _auth.currentUser;
@@ -89,7 +86,6 @@ class QuartierService {
     }
   }
 
-  // Récupérer tous les quartiers de l'utilisateur connecté
   Stream<List<Quartier>> getQuartiers() {
     final user = _auth.currentUser;
     if (user == null) {
@@ -106,7 +102,6 @@ class QuartierService {
         });
   }
 
-  // Méthode de test pour créer un quartier de test
   Future<void> createTestQuartier() async {
     try {
       await createQuartier(

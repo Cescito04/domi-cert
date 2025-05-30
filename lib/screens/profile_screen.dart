@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/user_profile_service.dart';
+import '../services/proprietaire_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,13 +11,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _userProfileService = UserProfileService();
-  final _displayNameController = TextEditingController();
-  final _phoneNumberController = TextEditingController();
-  final _addressController = TextEditingController();
+  final _proprietaireService = ProprietaireService();
   bool _isLoading = true;
-  bool _isEditing = false;
+  String _displayName = '';
+  String _phoneNumber = '';
 
   @override
   void initState() {
@@ -24,51 +23,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserProfile();
   }
 
-  @override
-  void dispose() {
-    _displayNameController.dispose();
-    _phoneNumberController.dispose();
-    _addressController.dispose();
-    super.dispose();
-  }
-
   Future<void> _loadUserProfile() async {
     setState(() => _isLoading = true);
     try {
-      final profile = await _userProfileService.getUserProfile();
-      if (profile != null) {
-        _displayNameController.text = profile['displayName'] ?? '';
-        _phoneNumberController.text = profile['phoneNumber'] ?? '';
-        _addressController.text = profile['address'] ?? '';
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur: ${e.toString()}')));
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-    try {
-      await _userProfileService.updateUserProfile(
-        displayName: _displayNameController.text,
-        phoneNumber: _phoneNumberController.text,
-        address: _addressController.text,
-      );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profil mis à jour avec succès')),
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final proprietaire = await _proprietaireService.getProprietaire(
+          user.uid,
         );
-        setState(() => _isEditing = false);
+        setState(() {
+          _displayName = proprietaire?.nom ?? user.displayName ?? '';
+          _phoneNumber = proprietaire?.telephone ?? '';
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -88,142 +54,249 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          if (!_isEditing)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => setState(() => _isEditing = true),
-            ),
-        ],
-      ),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      child: Text(
-                        _getInitials(user?.displayName),
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+              : CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: 200,
+                    pinned: true,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.8),
+                            ],
+                          ),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 40),
+                              Hero(
+                                tag: 'profile_avatar',
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: Colors.white,
+                                  child: Text(
+                                    _getInitials(_displayName),
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _displayName.isNotEmpty
+                                    ? _displayName
+                                    : 'Non défini',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    Form(
-                      key: _formKey,
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextFormField(
-                            controller: _displayNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nom complet',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            enabled: _isEditing,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez entrer votre nom';
-                              }
-                              return null;
-                            },
-                          ),
                           const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _phoneNumberController,
-                            decoration: const InputDecoration(
-                              labelText: 'Numéro de téléphone',
-                              prefixIcon: Icon(Icons.phone_outlined),
-                            ),
-                            enabled: _isEditing,
-                            keyboardType: TextInputType.phone,
-                          ),
+                          _buildSectionTitle('Informations personnelles'),
                           const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _addressController,
-                            decoration: const InputDecoration(
-                              labelText: 'Adresse',
-                              prefixIcon: Icon(Icons.location_on_outlined),
+                          _buildInfoCard(context, [
+                            _buildInfoTile(
+                              icon: Icons.person_outline,
+                              title: 'Nom',
+                              subtitle:
+                                  _displayName.isNotEmpty
+                                      ? _displayName
+                                      : 'Non défini',
+                              color: Colors.blue,
                             ),
-                            enabled: _isEditing,
-                            maxLines: 2,
-                          ),
+                            _buildInfoTile(
+                              icon: Icons.phone_outlined,
+                              title: 'Numéro de téléphone',
+                              subtitle:
+                                  _phoneNumber.isNotEmpty
+                                      ? _phoneNumber
+                                      : 'Non défini',
+                              color: Colors.green,
+                            ),
+                            _buildInfoTile(
+                              icon: Icons.email_outlined,
+                              title: 'Email',
+                              subtitle: user?.email ?? 'Non défini',
+                              color: Colors.orange,
+                            ),
+                          ]),
                           const SizedBox(height: 24),
-                          if (_isEditing)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() => _isEditing = false);
-                                    _loadUserProfile();
-                                  },
-                                  child: const Text('Annuler'),
+                          _buildSectionTitle('Statistiques'),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  context,
+                                  icon: Icons.home_outlined,
+                                  title: 'Maisons',
+                                  value: '0',
+                                  color: Colors.purple,
                                 ),
-                                const SizedBox(width: 16),
-                                ElevatedButton(
-                                  onPressed: _saveProfile,
-                                  child: const Text('Enregistrer'),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildStatCard(
+                                  context,
+                                  icon: Icons.people_outline,
+                                  title: 'Habitants',
+                                  value: '0',
+                                  color: Colors.teal,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Informations de connexion',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 16),
-                            ListTile(
-                              leading: const Icon(Icons.email_outlined),
-                              title: const Text('Email'),
-                              subtitle: Text(user?.email ?? 'Non défini'),
-                            ),
-                            const Divider(),
-                            ListTile(
-                              leading: const Icon(Icons.security_outlined),
-                              title: const Text('Dernière connexion'),
-                              subtitle: Text(
-                                user?.metadata.lastSignInTime?.toString() ??
-                                    'Non disponible',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
     );
   }
 
-  String _getInitials(String? displayName) {
-    if (displayName == null || displayName.isEmpty) {
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildInfoCard(BuildContext context, List<Widget> children) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        children:
+            children.map((child) {
+              final index = children.indexOf(child);
+              return Column(
+                children: [
+                  child,
+                  if (index < children.length - 1) const Divider(height: 1),
+                ],
+              );
+            }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getInitials(String displayName) {
+    if (displayName.isEmpty) {
       return 'U';
     }
     final nameParts = displayName.trim().split(' ');

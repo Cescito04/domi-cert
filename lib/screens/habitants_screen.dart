@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
 import '../models/habitant.dart';
@@ -95,7 +94,7 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
       _nomController.text = habitant.nom;
       _prenomController.text = habitant.prenom;
       _selectedMaisonId = habitant.maisonId;
-      // Récupérer le quartier de la maison sélectionnée
+
       final maison = await _maisonService.getMaison(habitant.maisonId);
       if (maison != null) {
         setState(() {
@@ -199,7 +198,7 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
                                   setModalState(() {
                                     _selectedQuartierId = value;
                                     _selectedMaisonId =
-                                        null; // Réinitialiser la maison sélectionnée
+                                        null;
                                   });
                                 },
                                 validator: (value) {
@@ -291,7 +290,7 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
                                         prenom: _prenomController.text,
                                         maisonId: _selectedMaisonId!,
                                         userId:
-                                            '', // Will be set by the service
+                                            '',
                                       );
                                       if (_editingHabitant == null) {
                                         await _habitantService.createHabitant(
