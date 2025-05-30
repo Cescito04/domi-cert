@@ -146,6 +146,9 @@ class HomeScreen extends ConsumerWidget {
                         icon: Icons.people_outline,
                         title: 'Habitants',
                         description: 'Gérez les habitants',
+                        onTap: () {
+                          Navigator.pushNamed(context, '/habitants');
+                        },
                       ),
                     ],
                   ),

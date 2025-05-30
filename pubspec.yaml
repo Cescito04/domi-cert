@@ -51,6 +51,7 @@ dependencies:
   # UI Components
   google_fonts: 
   flutter_spinkit: 
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
