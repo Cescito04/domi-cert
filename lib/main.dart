@@ -10,6 +10,7 @@ import 'package:homepass/screens/maisons_screen.dart';
 import 'package:homepass/screens/quartiers_screen.dart';
 import 'package:homepass/screens/habitants_screen.dart';
 import 'package:homepass/screens/habitant_details_screen.dart';
+import 'package:homepass/screens/profile_screen.dart';
 import 'package:homepass/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -117,6 +118,7 @@ class MyApp extends ConsumerWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/google-signin-phone') {
