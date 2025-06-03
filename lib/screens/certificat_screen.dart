@@ -292,7 +292,6 @@ class _CertificatScreenState extends State<CertificatScreen> {
                       itemBuilder: (context, index) {
                         final certificat = certificats[index];
 
-                        // Déterminer le texte du titre
                         String titleText;
                         if (_habitants.isNotEmpty) {
                           final habitant = _habitants.firstWhere(
@@ -303,7 +302,7 @@ class _CertificatScreenState extends State<CertificatScreen> {
                                 prenom: '',
                                 maisonId: '',
                                 userId:
-                                    ''), // Le prénom n'est plus nécessaire ici
+                                    ''), 
                           );
                           titleText = 'Certificat ${habitant.nom}';
                         } else {
