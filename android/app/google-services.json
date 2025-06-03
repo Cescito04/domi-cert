@@ -7,6 +7,42 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:711035505656:android:0b0cd4153e4862d353a40d",
+        "android_client_info": {
+          "package_name": "com.example.domicert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXUdevDEfprPIvNLf-UHVO0rgpUsr84lY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "711035505656-08vmp57o44livialfvi022vil1m8im6a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.homepass"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:711035505656:android:ec0a317e41c5811053a40d",
         "android_client_info": {
           "package_name": "com.example.homepass"
@@ -37,6 +73,13 @@
             {
               "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "711035505656-08vmp57o44livialfvi022vil1m8im6a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.homepass"
+              }
             }
           ]
         }

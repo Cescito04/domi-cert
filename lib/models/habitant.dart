@@ -47,4 +47,24 @@ class Habitant {
       userId: userId ?? this.userId,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Habitant &&
+        other.id == id &&
+        other.nom == nom &&
+        other.prenom == prenom &&
+        other.maisonId == maisonId &&
+        other.userId == userId;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        nom.hashCode ^
+        prenom.hashCode ^
+        maisonId.hashCode ^
+        userId.hashCode;
+  }
 }

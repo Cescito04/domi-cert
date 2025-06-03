@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:homepass/screens/auth/register_screen.dart';
-import 'package:homepass/services/auth_service.dart';
+import 'package:domicert/screens/auth/register_screen.dart';
+import 'package:domicert/services/auth_service.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -34,9 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       });
 
       try {
-        await ref
-            .read(authServiceProvider)
-            .signInWithEmailAndPassword(
+        await ref.read(authServiceProvider).signInWithEmailAndPassword(
               _emailController.text.trim(),
               _passwordController.text,
             );
@@ -95,14 +93,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: Theme.of(
                             context,
                           ).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Gestion des certificats de domicile',
-                          style: Theme.of(context).textTheme.bodyLarge
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
                               ?.copyWith(color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
@@ -179,12 +179,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _signIn,
-                            child:
-                                _isLoading
-                                    ? const SpinKitDoubleBounce(
-                                      color: Colors.white,
-                                    )
-                                    : const Text('Se connecter'),
+                            child: _isLoading
+                                ? const SpinKitDoubleBounce(
+                                    color: Colors.white,
+                                  )
+                                : const Text('Se connecter'),
                           ),
                         ),
                         const SizedBox(height: 16),

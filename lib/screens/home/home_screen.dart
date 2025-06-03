@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:homepass/services/auth_service.dart';
-import 'package:homepass/screens/quartiers_screen.dart';
-import 'package:homepass/screens/maisons_screen.dart';
-import 'package:homepass/screens/profile_screen.dart';
+import 'package:domicert/services/auth_service.dart';
+import 'package:domicert/screens/quartiers_screen.dart';
+import 'package:domicert/screens/maisons_screen.dart';
+import 'package:domicert/screens/profile_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -72,9 +72,9 @@ class HomeScreen extends ConsumerWidget {
                 Text(
                   'Fonctionnalités',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 Expanded(
@@ -89,6 +89,9 @@ class HomeScreen extends ConsumerWidget {
                         title: 'Certificats',
                         description: 'Gérez vos certificats de domicile',
                         color: Colors.blue,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/certificats');
+                        },
                       ),
                       _buildFeatureCard(
                         context,
@@ -183,16 +186,16 @@ class HomeScreen extends ConsumerWidget {
                       Text(
                         'Bienvenue sur DomiCert',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Votre plateforme de gestion des certificats de domicile',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withOpacity(0.9),
-                        ),
+                              color: Colors.white.withOpacity(0.9),
+                            ),
                       ),
                     ],
                   ),
@@ -245,9 +248,9 @@ class HomeScreen extends ConsumerWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

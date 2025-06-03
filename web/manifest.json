@@ -1,6 +1,6 @@
 {
-    "name": "homepass",
-    "short_name": "homepass",
+    "name": "domicert",
+    "short_name": "domicert",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

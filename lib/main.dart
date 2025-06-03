@@ -2,16 +2,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homepass/screens/auth/login_screen.dart';
-import 'package:homepass/screens/auth/register_screen.dart';
-import 'package:homepass/screens/auth/google_signin_phone_screen.dart';
-import 'package:homepass/screens/home/home_screen.dart';
-import 'package:homepass/screens/maisons_screen.dart';
-import 'package:homepass/screens/quartiers_screen.dart';
-import 'package:homepass/screens/habitants_screen.dart';
-import 'package:homepass/screens/habitant_details_screen.dart';
-import 'package:homepass/screens/profile_screen.dart';
-import 'package:homepass/services/auth_service.dart';
+import 'package:domicert/screens/auth/login_screen.dart';
+import 'package:domicert/screens/auth/register_screen.dart';
+import 'package:domicert/screens/auth/google_signin_phone_screen.dart';
+import 'package:domicert/screens/home/home_screen.dart';
+import 'package:domicert/screens/maisons_screen.dart';
+import 'package:domicert/screens/quartiers_screen.dart';
+import 'package:domicert/screens/habitants_screen.dart';
+import 'package:domicert/screens/habitant_details_screen.dart';
+import 'package:domicert/screens/profile_screen.dart';
+import 'package:domicert/screens/certificat_screen.dart';
+import 'package:domicert/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
@@ -102,19 +103,18 @@ class MyApp extends ConsumerWidget {
       themeMode: ThemeMode.system,
       home: authState.when(
         data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
-        loading:
-            () => const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-        error:
-            (error, stack) =>
-                Scaffold(body: Center(child: Text('Erreur: $error'))),
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (error, stack) =>
+            Scaffold(body: Center(child: Text('Erreur: $error'))),
       ),
       routes: {
         '/maisons': (context) => const MaisonsScreen(),
         '/quartiers': (context) => const QuartiersScreen(),
         '/habitants': (context) => const HabitantsScreen(),
         '/habitant-details': (context) => const HabitantDetailsScreen(),
+        '/certificats': (context) => const CertificatScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
@@ -124,12 +124,11 @@ class MyApp extends ConsumerWidget {
         if (settings.name == '/google-signin-phone') {
           final args = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(
-            builder:
-                (context) => GoogleSignInPhoneScreen(
-                  user: args['user'],
-                  displayName: args['displayName'],
-                  email: args['email'],
-                ),
+            builder: (context) => GoogleSignInPhoneScreen(
+              user: args['user'],
+              displayName: args['displayName'],
+              email: args['email'],
+            ),
           );
         }
         return null;

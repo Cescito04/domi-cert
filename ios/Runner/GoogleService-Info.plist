@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>711035505656-qdmh84c98d6olj9keasmh45c0t012ij5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.711035505656-qdmh84c98d6olj9keasmh45c0t012ij5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>711035505656-pd23n9gm11utr4jofm5r2hcsjma26bnh.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyApjKAZZS6wjRoQghPUFQ7lqoSjRSHSElo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>711035505656</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.domicert</string>
+	<key>PROJECT_ID</key>
+	<string>homepass-711ce</string>
+	<key>STORAGE_BUCKET</key>
+	<string>homepass-711ce.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:711035505656:ios:146a7578a4e5f05653a40d</string>
+</dict>
+</plist>
