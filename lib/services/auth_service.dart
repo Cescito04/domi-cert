@@ -47,39 +47,63 @@ class AuthService {
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      print('Attempting Google Sign-In');
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
+      if (googleUser == null) {
+        print('Google Sign-In aborted by user');
+        return null;
+      }
+      print('Google user signed in: ${googleUser.email}');
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+      print('Google authentication obtained');
+      print('Access Token: ${googleAuth.accessToken}');
+      print(
+          'ID Token: ${googleAuth.idToken?.substring(0, 10)}...'); // Log partial ID token
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
+      print('Firebase credential created');
 
+      print('Signing in with Firebase credential');
       final userCredential = await _auth.signInWithCredential(credential);
+      print('Signed in with Firebase: ${userCredential.user?.uid}');
+      print(
+          'User credential additional info: ${userCredential.additionalUserInfo}');
 
       if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        print('New user signed in with Google');
         return userCredential;
       } else {
+        print('Existing user signed in with Google');
+        final userId = userCredential.user!.uid;
+        print('Checking for existing proprietaire profile for user: $userId');
         final proprietaire = await _proprietaireService.getProprietaire(
-          userCredential.user!.uid,
+          userId,
         );
 
         if (proprietaire == null) {
+          print('No existing proprietaire profile, creating a new one');
           final newProprietaire = Proprietaire(
-            id: userCredential.user!.uid,
+            id: userId,
             nom: userCredential.user!.displayName ?? '',
             telephone: '',
             email: userCredential.user!.email ?? '',
           );
           await _proprietaireService.createProprietaire(newProprietaire);
+          print('New proprietaire profile created');
+        } else {
+          print('Existing proprietaire profile found');
         }
       }
 
       return userCredential;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error during Google Sign-In: $e');
+      print('Stack trace: $stackTrace');
       throw Exception('Erreur de connexion Google: $e');
     }
   }

@@ -22,6 +22,34 @@ class _CertificatScreenState extends State<CertificatScreen> {
   final _habitantService = HabitantService();
   Habitant? _selectedHabitant;
   bool _isGenerating = false;
+  List<Habitant> _habitants = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHabitants();
+  }
+
+  Future<void> _loadHabitants() async {
+    try {
+      _habitantService.getHabitants().listen((habitants) {
+        setState(() {
+          _habitants = habitants;
+        });
+      });
+    } catch (e) {
+      print('Erreur lors du chargement des habitants: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Erreur lors du chargement des habitants: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   Future<void> _generateCertificat() async {
     if (_selectedHabitant == null) return;
@@ -263,6 +291,26 @@ class _CertificatScreenState extends State<CertificatScreen> {
                       itemCount: certificats.length,
                       itemBuilder: (context, index) {
                         final certificat = certificats[index];
+
+                        // Déterminer le texte du titre
+                        String titleText;
+                        if (_habitants.isNotEmpty) {
+                          final habitant = _habitants.firstWhere(
+                            (h) => h.id == certificat.habitantId,
+                            orElse: () => Habitant(
+                                id: '',
+                                nom: 'Inconnu',
+                                prenom: '',
+                                maisonId: '',
+                                userId:
+                                    ''), // Le prénom n'est plus nécessaire ici
+                          );
+                          titleText = 'Certificat ${habitant.nom}';
+                        } else {
+                          titleText =
+                              'Certificat #${certificat.id.substring(0, 8)}'; 
+                        }
+
                         return Card(
                           margin: const EdgeInsets.only(bottom: 12),
                           elevation: 2,
@@ -280,7 +328,7 @@ class _CertificatScreenState extends State<CertificatScreen> {
                               ),
                             ),
                             title: Text(
-                              'Certificat #${certificat.id.substring(0, 8)}',
+                              titleText, // Utiliser le texte du titre déterminé
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -306,6 +354,14 @@ class _CertificatScreenState extends State<CertificatScreen> {
                                     tooltip: 'Annuler le certificat',
                                     color: Colors.red,
                                   ),
+                                // Bouton de suppression
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed: () =>
+                                      _confirmDelete(certificat.id),
+                                  tooltip: 'Supprimer le certificat',
+                                  color: Colors.grey[600],
+                                ),
                               ],
                             ),
                           ),
@@ -320,5 +376,67 @@ class _CertificatScreenState extends State<CertificatScreen> {
         ),
       ),
     );
+  }
+
+  // Méthode pour confirmer la suppression
+  Future<void> _confirmDelete(String certificatId) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmer la suppression'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Voulez-vous vraiment supprimer ce certificat ?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child:
+                  const Text('Supprimer', style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteCertificat(certificatId);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Méthode pour supprimer le certificat
+  Future<void> _deleteCertificat(String certificatId) async {
+    try {
+      await _certificatService.deleteCertificat(certificatId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Certificat supprimé avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Erreur lors de la suppression du certificat: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Erreur lors de la suppression du certificat: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

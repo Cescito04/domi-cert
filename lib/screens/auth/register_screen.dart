@@ -33,15 +33,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        final userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            );
+        print(
+            'Attempting to create user with email: ${_emailController.text.trim()}');
+        final userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+        print('User created successfully: ${userCredential.user?.uid}');
+        print(
+            'User credential additional info: ${userCredential.additionalUserInfo}');
 
         await userCredential.user?.updateDisplayName(
           _nomController.text.trim(),
         );
+        print('Display name updated');
 
         final proprietaire = Proprietaire(
           id: userCredential.user!.uid,
@@ -50,12 +56,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
           email: _emailController.text.trim(),
         );
 
+        print('Creating proprietaire profile for user: ${proprietaire.id}');
         await _proprietaireService.createProprietaire(proprietaire);
+        print('Proprietaire profile created');
 
         await userCredential.user?.updateProfile(
           displayName: _nomController.text.trim(),
           photoURL: null,
         );
+        print('User profile updated');
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -67,6 +76,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.pushReplacementNamed(context, '/home');
         }
       } on FirebaseAuthException catch (e) {
+        print(
+            'Firebase Auth Error during registration: ${e.code} - ${e.message}');
         String message = 'Une erreur est survenue';
         if (e.code == 'weak-password') {
           message = 'Le mot de passe est trop faible';
@@ -142,14 +153,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: Theme.of(
                             context,
                           ).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Rejoignez DomiCert pour gérer vos certificats',
-                          style: Theme.of(context).textTheme.bodyLarge
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
                               ?.copyWith(color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
@@ -265,23 +278,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child:
-                                _isLoading
-                                    ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
                                       ),
-                                    )
-                                    : const Text(
-                                      'S\'inscrire',
-                                      style: TextStyle(fontSize: 16),
                                     ),
+                                  )
+                                : const Text(
+                                    'S\'inscrire',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 16),

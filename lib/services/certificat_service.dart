@@ -109,6 +109,23 @@ class CertificatService {
     });
   }
 
+  // Supprimer un certificat
+  Future<void> deleteCertificat(String id) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('Utilisateur non connecté');
+
+    final doc = await _certificatsCollection.doc(id).get();
+    if (!doc.exists) throw Exception('Certificat non trouvé');
+
+    final data = doc.data() as Map<String, dynamic>;
+    if (data['userId'] != user.uid) {
+      throw Exception('Accès non autorisé');
+    }
+
+    // Supprimer le document du certificat
+    await _certificatsCollection.doc(id).delete();
+  }
+
   // Obtenir les informations complètes pour la génération du PDF
   Future<Map<String, dynamic>> getCertificatData(String habitantId) async {
     final habitant = await _habitantService.getHabitant(habitantId);

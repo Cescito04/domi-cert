@@ -1,85 +1,42 @@
 {
   "project_info": {
-    "project_number": "711035505656",
-    "project_id": "homepass-711ce",
-    "storage_bucket": "homepass-711ce.firebasestorage.app"
+    "project_number": "892900617371",
+    "project_id": "domicert-53795",
+    "storage_bucket": "domicert-53795.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:711035505656:android:0b0cd4153e4862d353a40d",
+        "mobilesdk_app_id": "1:892900617371:android:22f65220ad91a9b1172a3e",
         "android_client_info": {
           "package_name": "com.example.domicert"
         }
       },
       "oauth_client": [
         {
-          "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAXUdevDEfprPIvNLf-UHVO0rgpUsr84lY"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "711035505656-08vmp57o44livialfvi022vil1m8im6a.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.homepass"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:711035505656:android:ec0a317e41c5811053a40d",
-        "android_client_info": {
-          "package_name": "com.example.homepass"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "711035505656-pd23n9gm11utr4jofm5r2hcsjma26bnh.apps.googleusercontent.com",
+          "client_id": "892900617371-14f4cvimmviftriiqkat5i0980aq4aqh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.homepass",
+            "package_name": "com.example.domicert",
             "certificate_hash": "f2b021a3edb34ad4b6a2cca0784227cbd43ec63f"
           }
         },
         {
-          "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
+          "client_id": "892900617371-ngju600epgbsecdm3ront8b4324r1avc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAXUdevDEfprPIvNLf-UHVO0rgpUsr84lY"
+          "current_key": "AIzaSyCAYMJJNbWtzj4NC8R8dgPj7qUexa4JnyM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "711035505656-ehifo6e1lc4p5lbcf1qg3q6bbavig96o.apps.googleusercontent.com",
+              "client_id": "892900617371-ngju600epgbsecdm3ront8b4324r1avc.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "711035505656-08vmp57o44livialfvi022vil1m8im6a.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.homepass"
-              }
             }
           ]
         }
