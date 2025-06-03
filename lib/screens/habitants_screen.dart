@@ -46,9 +46,8 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
   }
 
   Future<void> _loadData() async {
-    _quartiersSubscription = _quartierService.getQuartiers().listen((
-      quartiers,
-    ) {
+    _quartiersSubscription =
+        _quartierService.getQuartiers().listen((quartiers) {
       if (mounted) {
         setState(() {
           _quartiers = quartiers;
@@ -60,7 +59,6 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
       if (mounted) {
         setState(() {
           _maisons = maisons;
-          // Si on est en mode édition, on s'assure que la maison sélectionnée est toujours valide
           if (_editingHabitant != null && _selectedMaisonId != null) {
             final maisonExists = maisons.any((m) => m.id == _selectedMaisonId);
             if (!maisonExists) {
@@ -113,248 +111,210 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder:
-          (context) => StatefulBuilder(
-            builder:
-                (context, setModalState) => Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                    left: 24,
-                    right: 24,
-                    top: 24,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            habitant == null
-                                ? 'Ajouter un Habitant'
-                                : 'Modifier l\'Habitant',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _nomController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nom',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez entrer un nom';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _prenomController,
-                            decoration: const InputDecoration(
-                              labelText: 'Prénom',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez entrer un prénom';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          StreamBuilder<List<Quartier>>(
-                            stream: _quartierService.getQuartiers(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return Text('Erreur: ${snapshot.error}');
-                              }
-                              if (!snapshot.hasData) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              final quartiers = snapshot.data!;
-                              return DropdownButtonFormField<String>(
-                                value: _selectedQuartierId,
-                                decoration: const InputDecoration(
-                                  labelText: 'Quartier',
-                                  prefixIcon: Icon(
-                                    Icons.location_city_outlined,
-                                  ),
-                                ),
-                                items:
-                                    quartiers.map((quartier) {
-                                      return DropdownMenuItem(
-                                        value: quartier.id,
-                                        child: Text(quartier.nom),
-                                      );
-                                    }).toList(),
-                                onChanged: (value) {
-                                  setModalState(() {
-                                    _selectedQuartierId = value;
-                                    _selectedMaisonId =
-                                        null;
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Veuillez sélectionner un quartier';
-                                  }
-                                  return null;
-                                },
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          StreamBuilder<List<Maison>>(
-                            stream: _maisonService.getMaisons(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return Text('Erreur: ${snapshot.error}');
-                              }
-                              if (!snapshot.hasData) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              final maisons = snapshot.data!;
-                              final filteredMaisons =
-                                  _selectedQuartierId == null
-                                      ? maisons
-                                      : maisons
-                                          .where(
-                                            (m) =>
-                                                m.quartierId ==
-                                                _selectedQuartierId,
-                                          )
-                                          .toList();
-
-                              return DropdownButtonFormField<String>(
-                                value: _selectedMaisonId,
-                                decoration: const InputDecoration(
-                                  labelText: 'Maison',
-                                  prefixIcon: Icon(Icons.home_outlined),
-                                ),
-                                items:
-                                    filteredMaisons.map((maison) {
-                                      return DropdownMenuItem(
-                                        value: maison.id,
-                                        child: Text(maison.adresse),
-                                      );
-                                    }).toList(),
-                                onChanged:
-                                    _selectedQuartierId == null
-                                        ? null
-                                        : (value) {
-                                          setModalState(() {
-                                            _selectedMaisonId = value;
-                                          });
-                                        },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Veuillez sélectionner une maison';
-                                  }
-                                  return null;
-                                },
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (_editingHabitant != null)
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _resetForm();
-                                  },
-                                  child: const Text('Annuler'),
-                                ),
-                              const SizedBox(width: 8),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState?.validate() ??
-                                      false) {
-                                    try {
-                                      final habitant = Habitant(
-                                        id:
-                                            _editingHabitant?.id ??
-                                            const Uuid().v4(),
-                                        nom: _nomController.text,
-                                        prenom: _prenomController.text,
-                                        maisonId: _selectedMaisonId!,
-                                        userId:
-                                            '',
-                                      );
-                                      if (_editingHabitant == null) {
-                                        await _habitantService.createHabitant(
-                                          habitant,
-                                        );
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Habitant créé avec succès',
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      } else {
-                                        await _habitantService.updateHabitant(
-                                          habitant,
-                                        );
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Habitant mis à jour avec succès',
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                      Navigator.pop(context);
-                                      _resetForm();
-                                    } catch (e) {
-                                      if (mounted) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Erreur: ${e.toString()}',
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  }
-                                },
-                                child: Text(
-                                  _editingHabitant == null
-                                      ? 'Ajouter'
-                                      : 'Mettre à jour',
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 24,
+            right: 24,
+            top: 24,
           ),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    habitant == null
+                        ? 'Ajouter un Habitant'
+                        : 'Modifier l\'Habitant',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    controller: _nomController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nom',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer un nom';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _prenomController,
+                    decoration: const InputDecoration(
+                      labelText: 'Prénom',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer un prénom';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  StreamBuilder<List<Quartier>>(
+                    stream: _quartierService.getQuartiers(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Erreur: ${snapshot.error}');
+                      }
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final quartiers = snapshot.data!;
+                      return DropdownButtonFormField<String>(
+                        value: _selectedQuartierId,
+                        decoration: const InputDecoration(
+                          labelText: 'Quartier',
+                          prefixIcon: Icon(Icons.location_city_outlined),
+                        ),
+                        items: quartiers.map((quartier) {
+                          return DropdownMenuItem(
+                            value: quartier.id,
+                            child: Text(quartier.nom),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setModalState(() {
+                            _selectedQuartierId = value;
+                            _selectedMaisonId = null;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez sélectionner un quartier';
+                          }
+                          return null;
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  StreamBuilder<List<Maison>>(
+                    stream: _maisonService.getMaisons(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Erreur: ${snapshot.error}');
+                      }
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final maisons = snapshot.data!;
+                      final filteredMaisons = _selectedQuartierId == null
+                          ? maisons
+                          : maisons
+                              .where((m) => m.quartierId == _selectedQuartierId)
+                              .toList();
+
+                      return DropdownButtonFormField<String>(
+                        value: _selectedMaisonId,
+                        decoration: const InputDecoration(
+                          labelText: 'Maison',
+                          prefixIcon: Icon(Icons.home_outlined),
+                        ),
+                        items: filteredMaisons.map((maison) {
+                          return DropdownMenuItem(
+                            value: maison.id,
+                            child: Text(maison.adresse),
+                          );
+                        }).toList(),
+                        onChanged: _selectedQuartierId == null
+                            ? null
+                            : (value) {
+                                setModalState(() {
+                                  _selectedMaisonId = value;
+                                });
+                              },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez sélectionner une maison';
+                          }
+                          return null;
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (_editingHabitant != null)
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _resetForm();
+                          },
+                          child: const Text('Annuler'),
+                        ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            try {
+                              final habitant = Habitant(
+                                id: _editingHabitant?.id ?? const Uuid().v4(),
+                                nom: _nomController.text,
+                                prenom: _prenomController.text,
+                                maisonId: _selectedMaisonId!,
+                                userId: '',
+                              );
+                              if (_editingHabitant == null) {
+                                await _habitantService.createHabitant(habitant);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text('Habitant créé avec succès')),
+                                  );
+                                }
+                              } else {
+                                await _habitantService.updateHabitant(habitant);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Habitant mis à jour avec succès')),
+                                  );
+                                }
+                              }
+                              Navigator.pop(context);
+                              _resetForm();
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text('Erreur: ${e.toString()}')),
+                                );
+                              }
+                            }
+                          }
+                        },
+                        child: Text(_editingHabitant == null
+                            ? 'Ajouter'
+                            : 'Mettre à jour'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -368,9 +328,9 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur: ${e.toString()}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: ${e.toString()}')),
+        );
       }
     }
   }
@@ -422,15 +382,16 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
                         ),
                         leading: CircleAvatar(
                           radius: 26,
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.15),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.15),
                           child: Text(
                             habitant.prenom.isNotEmpty
                                 ? habitant.prenom[0].toUpperCase()
                                 : habitant.nom.isNotEmpty
-                                ? habitant.nom[0].toUpperCase()
-                                : '?',
+                                    ? habitant.nom[0].toUpperCase()
+                                    : '?',
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -439,64 +400,56 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
                         ),
                         title: Text(
                           '${habitant.prenom} ${habitant.nom}',
-                          style: Theme.of(context).textTheme.titleMedium
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        subtitle:
-                            maison != null
-                                ? Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.home_outlined,
-                                      size: 16,
-                                      color: Colors.grey,
+                        subtitle: maison != null
+                            ? Row(
+                                children: [
+                                  const Icon(
+                                    Icons.home_outlined,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      maison.adresse,
+                                      style:
+                                          const TextStyle(color: Colors.grey),
                                     ),
-                                    const SizedBox(width: 4),
-                                    Flexible(
-                                      child: Text(
-                                        maison.adresse,
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                                : const Text(
-                                  'Chargement...',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
+                                  ),
+                                ],
+                              )
+                            : const Text(
+                                'Chargement...',
+                                style: TextStyle(color: Colors.grey),
+                              ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(
-                                Icons.visibility,
-                                color: Colors.blueAccent,
-                              ),
+                              icon: const Icon(Icons.visibility,
+                                  color: Colors.blueAccent),
                               tooltip: 'Voir les détails',
                               onPressed: () {
                                 Navigator.pushNamed(
-                                  context,
-                                  '/habitant-details',
-                                  arguments: habitant,
-                                );
+                                    context, '/habitant-details',
+                                    arguments: habitant);
                               },
                             ),
                             IconButton(
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Colors.orange,
-                              ),
+                              icon:
+                                  const Icon(Icons.edit, color: Colors.orange),
                               tooltip: 'Modifier',
-                              onPressed:
-                                  () => _openHabitantForm(habitant: habitant),
+                              onPressed: () =>
+                                  _openHabitantForm(habitant: habitant),
                             ),
                             IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.redAccent,
-                              ),
+                              icon: const Icon(Icons.delete,
+                                  color: Colors.redAccent),
                               tooltip: 'Supprimer',
                               onPressed: () => _deleteHabitant(habitant.id),
                             ),

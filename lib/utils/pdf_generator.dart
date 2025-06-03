@@ -24,7 +24,6 @@ class PdfGenerator {
       ),
     );
 
-    // Date d'émission
     final dateEmission = pw.Text(
       'Date d\'émission: ${DateTime.now().toString().split(' ')[0]}',
       style: const pw.TextStyle(fontSize: 12),
