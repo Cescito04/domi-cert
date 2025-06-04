@@ -5,12 +5,14 @@ import 'package:path_provider/path_provider.dart';
 import '../models/habitant.dart';
 import '../models/maison.dart';
 import '../models/quartier.dart';
+import '../models/proprietaire.dart';
 
 class PdfGenerator {
   static Future<File> generateCertificat({
     required Habitant habitant,
     required Maison maison,
     required Quartier quartier,
+    required Proprietaire proprietaire,
   }) async {
     final pdf = pw.Document();
 
@@ -59,6 +61,8 @@ class PdfGenerator {
           pw.SizedBox(height: 10),
           _buildInfoRow('Adresse', maison.adresse),
           _buildInfoRow('Quartier', quartier.nom),
+          _buildInfoRow('Chef de Quartier', quartier.chefQuartierId),
+          _buildInfoRow('Propriétaire', proprietaire.nom),
         ],
       ),
     );

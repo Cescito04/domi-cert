@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/user_profile_service.dart';
 import '../services/proprietaire_service.dart';
+import '../services/maison_service.dart';
+import '../services/habitant_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,9 +15,13 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _userProfileService = UserProfileService();
   final _proprietaireService = ProprietaireService();
+  final _maisonService = MaisonService();
+  final _habitantService = HabitantService();
   bool _isLoading = true;
   String _displayName = '';
   String _phoneNumber = '';
+  int _maisonsCount = 0;
+  int _habitantsCount = 0;
 
   @override
   void initState() {
@@ -28,9 +34,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final proprietaire = await _proprietaireService.getProprietaire(
-          user.uid,
-        );
+        final proprietaire =
+            await _proprietaireService.getProprietaire(user.uid);
+
+        // Récupérer les maisons
+        final maisonsStream = _maisonService.getMaisons();
+        maisonsStream.listen((maisons) {
+          if (mounted) {
+            setState(() {
+              _maisonsCount = maisons.length;
+            });
+          }
+        });
+
+        // Récupérer les habitants
+        final habitantsStream = _habitantService.getHabitants();
+        habitantsStream.listen((habitants) {
+          if (mounted) {
+            setState(() {
+              _habitantsCount = habitants.length;
+            });
+          }
+        });
+
         setState(() {
           _displayName = proprietaire?.nom ?? user.displayName ?? '';
           _phoneNumber = proprietaire?.telephone ?? '';
@@ -38,9 +64,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur: ${e.toString()}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: ${e.toString()}')),
+        );
       }
     } finally {
       if (mounted) {
@@ -54,133 +80,130 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: 200,
-                    pinned: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Theme.of(context).colorScheme.primary,
-                              Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.8),
-                            ],
-                          ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 200,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.8),
+                          ],
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 40),
-                              Hero(
-                                tag: 'profile_avatar',
-                                child: CircleAvatar(
-                                  radius: 50,
-                                  backgroundColor: Colors.white,
-                                  child: Text(
-                                    _getInitials(_displayName),
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 40),
+                            Hero(
+                              tag: 'profile_avatar',
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.white,
+                                child: Text(
+                                  _getInitials(_displayName),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                _displayName.isNotEmpty
-                                    ? _displayName
-                                    : 'Non défini',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              _displayName.isNotEmpty
+                                  ? _displayName
+                                  : 'Non défini',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          _buildSectionTitle('Informations personnelles'),
-                          const SizedBox(height: 16),
-                          _buildInfoCard(context, [
-                            _buildInfoTile(
-                              icon: Icons.person_outline,
-                              title: 'Nom',
-                              subtitle:
-                                  _displayName.isNotEmpty
-                                      ? _displayName
-                                      : 'Non défini',
-                              color: Colors.blue,
-                            ),
-                            _buildInfoTile(
-                              icon: Icons.phone_outlined,
-                              title: 'Numéro de téléphone',
-                              subtitle:
-                                  _phoneNumber.isNotEmpty
-                                      ? _phoneNumber
-                                      : 'Non défini',
-                              color: Colors.green,
-                            ),
-                            _buildInfoTile(
-                              icon: Icons.email_outlined,
-                              title: 'Email',
-                              subtitle: user?.email ?? 'Non défini',
-                              color: Colors.orange,
-                            ),
-                          ]),
-                          const SizedBox(height: 24),
-                          _buildSectionTitle('Statistiques'),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatCard(
-                                  context,
-                                  icon: Icons.home_outlined,
-                                  title: 'Maisons',
-                                  value: '0',
-                                  color: Colors.purple,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: _buildStatCard(
-                                  context,
-                                  icon: Icons.people_outline,
-                                  title: 'Habitants',
-                                  value: '0',
-                                  color: Colors.teal,
-                                ),
-                              ),
-                            ],
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        _buildSectionTitle('Informations personnelles'),
+                        const SizedBox(height: 16),
+                        _buildInfoCard(context, [
+                          _buildInfoTile(
+                            icon: Icons.person_outline,
+                            title: 'Nom',
+                            subtitle: _displayName.isNotEmpty
+                                ? _displayName
+                                : 'Non défini',
+                            color: Colors.blue,
                           ),
-                        ],
-                      ),
+                          _buildInfoTile(
+                            icon: Icons.phone_outlined,
+                            title: 'Numéro de téléphone',
+                            subtitle: _phoneNumber.isNotEmpty
+                                ? _phoneNumber
+                                : 'Non défini',
+                            color: Colors.green,
+                          ),
+                          _buildInfoTile(
+                            icon: Icons.email_outlined,
+                            title: 'Email',
+                            subtitle: user?.email ?? 'Non défini',
+                            color: Colors.orange,
+                          ),
+                        ]),
+                        const SizedBox(height: 24),
+                        _buildSectionTitle('Statistiques'),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                context,
+                                icon: Icons.home_outlined,
+                                title: 'Maisons',
+                                value: _maisonsCount.toString(),
+                                color: Colors.purple,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildStatCard(
+                                context,
+                                icon: Icons.people_outline,
+                                title: 'Habitants',
+                                value: _habitantsCount.toString(),
+                                color: Colors.teal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -196,16 +219,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
-        children:
-            children.map((child) {
-              final index = children.indexOf(child);
-              return Column(
-                children: [
-                  child,
-                  if (index < children.length - 1) const Divider(height: 1),
-                ],
-              );
-            }).toList(),
+        children: children.map((child) {
+          final index = children.indexOf(child);
+          return Column(
+            children: [
+              child,
+              if (index < children.length - 1) const Divider(height: 1),
+            ],
+          );
+        }).toList(),
       ),
     );
   }

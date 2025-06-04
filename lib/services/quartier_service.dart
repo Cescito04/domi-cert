@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/quartier.dart';
 
 class QuartierService {
-  final CollectionReference _quartiersCollection = FirebaseFirestore.instance
-      .collection('quartiers');
+  final CollectionReference _quartiersCollection =
+      FirebaseFirestore.instance.collection('quartiers');
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> createQuartier(Quartier quartier) async {
@@ -21,7 +21,6 @@ class QuartierService {
     }
   }
 
-  // Récupérer un quartier par son ID
   Future<Quartier?> getQuartier(String id) async {
     try {
       final user = _auth.currentUser;
@@ -96,10 +95,10 @@ class QuartierService {
         .where('userId', isEqualTo: user.uid)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return Quartier.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-          }).toList();
-        });
+      return snapshot.docs.map((doc) {
+        return Quartier.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    });
   }
 
   Future<void> createTestQuartier() async {
@@ -110,6 +109,7 @@ class QuartierService {
           nom: 'Quartier Test',
           description: 'Description du quartier test',
           userId: _auth.currentUser?.uid ?? '',
+          chefQuartierId: 'Chef Test',
         ),
       );
     } catch (e) {

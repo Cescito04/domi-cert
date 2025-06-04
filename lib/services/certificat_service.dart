@@ -7,6 +7,7 @@ import '../models/certificat.dart';
 import 'habitant_service.dart';
 import 'maison_service.dart';
 import 'quartier_service.dart';
+import 'proprietaire_service.dart';
 
 class CertificatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -17,6 +18,7 @@ class CertificatService {
   final HabitantService _habitantService = HabitantService();
   final MaisonService _maisonService = MaisonService();
   final QuartierService _quartierService = QuartierService();
+  final ProprietaireService _proprietaireService = ProprietaireService();
 
   // Créer un nouveau certificat
   Future<Certificat> createCertificat(String habitantId, File pdfFile) async {
@@ -135,6 +137,15 @@ class CertificatService {
     final quartier = await _quartierService.getQuartier(maison.quartierId);
     if (quartier == null) throw Exception('Quartier non trouvé');
 
-    return {'habitant': habitant, 'maison': maison, 'quartier': quartier};
+    final proprietaire =
+        await _proprietaireService.getProprietaire(maison.proprietaireId);
+    if (proprietaire == null) throw Exception('Propriétaire non trouvé');
+
+    return {
+      'habitant': habitant,
+      'maison': maison,
+      'quartier': quartier,
+      'proprietaire': proprietaire,
+    };
   }
 }

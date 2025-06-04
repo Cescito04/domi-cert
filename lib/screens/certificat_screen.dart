@@ -73,6 +73,7 @@ class _CertificatScreenState extends State<CertificatScreen> {
         habitant: data['habitant'],
         maison: data['maison'],
         quartier: data['quartier'],
+        proprietaire: data['proprietaire'],
       );
       print('PDF généré avec succès: ${pdfFile.path}');
 
@@ -301,13 +302,12 @@ class _CertificatScreenState extends State<CertificatScreen> {
                                 nom: 'Inconnu',
                                 prenom: '',
                                 maisonId: '',
-                                userId:
-                                    ''), 
+                                userId: ''),
                           );
                           titleText = 'Certificat ${habitant.nom}';
                         } else {
                           titleText =
-                              'Certificat #${certificat.id.substring(0, 8)}'; 
+                              'Certificat #${certificat.id.substring(0, 8)}';
                         }
 
                         return Card(
