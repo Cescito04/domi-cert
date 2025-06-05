@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -16,7 +17,10 @@ class PdfGenerator {
   }) async {
     final pdf = pw.Document();
 
-    // En-tête
+    final stampImage = await rootBundle.load('assets/images/tampon.png');
+    final stampImageBytes = stampImage.buffer.asUint8List();
+    final stampImagePdf = pw.MemoryImage(stampImageBytes);
+
     final header = pw.Header(
       level: 0,
       child: pw.Text(
@@ -67,13 +71,29 @@ class PdfGenerator {
       ),
     );
 
-    // Pied de page
+    // Pied de page avec tampon
     final footer = pw.Container(
       padding: const pw.EdgeInsets.all(20),
-      child: pw.Text(
-        'Ce certificat est valide pour une durée d\'un an à compter de la date d\'émission.',
-        style: const pw.TextStyle(fontSize: 10),
-        textAlign: pw.TextAlign.center,
+      child: pw.Column(
+        children: [
+          pw.Text(
+            'Ce certificat est valide pour une durée d\'un an à compter de la date d\'émission.',
+            style: const pw.TextStyle(fontSize: 10),
+            textAlign: pw.TextAlign.center,
+          ),
+          pw.SizedBox(height: 20),
+          pw.Align(
+            alignment: pw.Alignment.center,
+            child: pw.Opacity(
+              opacity: 0.7,
+              child: pw.Image(
+                stampImagePdf,
+                width: 150,
+                height: 150,
+              ),
+            ),
+          ),
+        ],
       ),
     );
 
