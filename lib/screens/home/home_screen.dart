@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/services/auth_service.dart';
-import 'package:domicert/screens/quartiers_screen.dart';
+import 'package:domicert/screens/quartiers_screen_list.dart';
 import 'package:domicert/screens/quartier_screen.dart';
 import 'package:domicert/screens/maisons_screen.dart';
 import 'package:domicert/screens/profile_screen.dart';

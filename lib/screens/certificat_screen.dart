@@ -59,7 +59,7 @@ class _CertificatScreenState extends State<CertificatScreen> {
     try {
       final data =
           await _certificatService.getCertificatData(_selectedHabitant!.id);
-      final pdfFile = await PdfGenerator.generateCertificat(
+      final pdfFile = await PdfGenerator.generateCertificate(
         habitant: data['habitant'],
         maison: data['maison'],
         quartier: data['quartier'],

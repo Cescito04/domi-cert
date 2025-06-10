@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data';
 import '../models/habitant.dart';
 import '../models/maison.dart';
 import '../models/quartier.dart';
 import '../models/proprietaire.dart';
 
 class PdfGenerator {
-  static Future<File> generateCertificat({
+  static Future<File> generateCertificate({
     required Habitant habitant,
     required Maison maison,
     required Quartier quartier,
@@ -21,80 +22,100 @@ class PdfGenerator {
     final stampImageBytes = stampImage.buffer.asUint8List();
     final stampImagePdf = pw.MemoryImage(stampImageBytes);
 
-    final header = pw.Header(
-      level: 0,
-      child: pw.Text(
-        'CERTIFICAT DE DOMICILE',
-        style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-        textAlign: pw.TextAlign.center,
-      ),
-    );
-
-    final dateEmission = pw.Text(
-      'Date d\'émission: ${DateTime.now().toString().split(' ')[0]}',
-      style: const pw.TextStyle(fontSize: 12),
-    );
-
-    // Informations de l'habitant
-    final habitantInfo = pw.Container(
-      padding: const pw.EdgeInsets.all(20),
+    // En-tête du certificat
+    final header = pw.Center(
       child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
         children: [
           pw.Text(
-            'INFORMATIONS DE L\'HABITANT',
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 10),
-          _buildInfoRow('Nom', habitant.nom),
-          _buildInfoRow('Prénom', habitant.prenom),
-        ],
-      ),
-    );
-
-    // Informations de l'adresse
-    final adresseInfo = pw.Container(
-      padding: const pw.EdgeInsets.all(20),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(
-            'ADRESSE',
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 10),
-          _buildInfoRow('Adresse', maison.adresse),
-          _buildInfoRow('Quartier', quartier.nom),
-          _buildInfoRow(
-            'Chef de Quartier',
-            '${quartier.chefPrenom} ${quartier.chefNom}',
-          ),
-          _buildInfoRow('Propriétaire', proprietaire.nom),
-        ],
-      ),
-    );
-
-    // Pied de page avec tampon
-    final footer = pw.Container(
-      padding: const pw.EdgeInsets.all(20),
-      child: pw.Column(
-        children: [
-          pw.Text(
-            'Ce certificat est valide pour une durée d\'un an à compter de la date d\'émission.',
-            style: const pw.TextStyle(fontSize: 10),
+            'RÉPUBLIQUE DU SÉNÉGAL',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+            ),
             textAlign: pw.TextAlign.center,
           ),
-          pw.SizedBox(height: 20),
-          pw.Align(
-            alignment: pw.Alignment.center,
-            child: pw.Opacity(
-              opacity: 0.7,
-              child: pw.Image(
-                stampImagePdf,
-                width: 150,
-                height: 150,
-              ),
+          pw.SizedBox(height: 10),
+          pw.Text(
+            'COMMUNE DE ${quartier.commune.toUpperCase()}',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
             ),
+            textAlign: pw.TextAlign.center,
+          ),
+          pw.SizedBox(height: 40),
+          pw.Text(
+            'CERTIFICAT DE DOMICILE',
+            style: pw.TextStyle(
+              fontSize: 24,
+              fontWeight: pw.FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+            textAlign: pw.TextAlign.center,
+          ),
+          //pw.SizedBox(height: 40),
+        ],
+      ),
+    );
+
+    // Corps du certificat
+    final body = pw.Container(
+      padding: const pw.EdgeInsets.symmetric(vertical: 20),
+      child: pw.Text(
+        'Je soussigné Monsieur ${quartier.chefNom} ${quartier.chefPrenom}, Délégué de quartier ${quartier.nom}, atteste que M. ${habitant.nom} ${habitant.prenom} est domicilié dans mon quartier chez M. ${proprietaire.nom}, ${maison.adresse}.',
+        style: const pw.TextStyle(fontSize: 18),
+        textAlign: pw.TextAlign.justify,
+      ),
+    );
+
+    // Pied de page avec signature et date
+    final footer = pw.Container(
+      padding: const pw.EdgeInsets.only(top: 50),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          // Signature à gauche
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Le délégué du quartier',
+                style: const pw.TextStyle(fontSize: 14),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Stack(
+                alignment: pw.Alignment.center,
+                children: [
+                  pw.Opacity(
+                    opacity: 0.7,
+                    child: pw.Image(
+                      stampImagePdf,
+                      width: 100,
+                      height: 100,
+                    ),
+                  ),
+                  pw.Text(
+                    '${quartier.chefNom} ${quartier.chefPrenom}',
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // Date à droite
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
+              pw.Text(
+                'fait à ${quartier.commune}, le ${DateTime.now().toString().split(' ')[0]}',
+                style: const pw.TextStyle(fontSize: 14),
+              ),
+            ],
           ),
         ],
       ),
@@ -105,22 +126,23 @@ class PdfGenerator {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         build: (context) => [
-          header,
-          pw.SizedBox(height: 20),
-          dateEmission,
-          pw.SizedBox(height: 20),
-          habitantInfo,
-          pw.SizedBox(height: 20),
-          adresseInfo,
-          pw.SizedBox(height: 40),
-          footer,
+          pw.Center(
+            child: pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                header,
+                body,
+                footer,
+              ],
+            ),
+          ),
         ],
       ),
     );
 
-    // Sauvegarde du PDF
-    final output = await getTemporaryDirectory();
-    final file = File('${output.path}/certificat_${habitant.id}.pdf');
+    final file =
+        File('${(await getTemporaryDirectory()).path}/certificate.pdf');
     await file.writeAsBytes(await pdf.save());
     return file;
   }

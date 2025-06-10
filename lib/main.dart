@@ -7,7 +7,7 @@ import 'package:domicert/screens/auth/register_screen.dart';
 import 'package:domicert/screens/auth/google_signin_phone_screen.dart';
 import 'package:domicert/screens/home/home_screen.dart';
 import 'package:domicert/screens/maisons_screen.dart';
-import 'package:domicert/screens/quartiers_screen.dart';
+import 'package:domicert/screens/quartiers_screen_list.dart';
 import 'package:domicert/screens/habitants_screen.dart';
 import 'package:domicert/screens/habitant_details_screen.dart';
 import 'package:domicert/screens/profile_screen.dart';
