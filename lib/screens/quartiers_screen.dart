@@ -108,7 +108,6 @@ class _QuartiersScreenState extends ConsumerState<QuartiersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Commune: ${quartier.commune}'),
-                      Text('Description: ${quartier.description}'),
                       Text('Chef: ${quartier.chefPrenom} ${quartier.chefNom}'),
                     ],
                   ),

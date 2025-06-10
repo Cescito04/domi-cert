@@ -113,7 +113,6 @@ class QuartierService {
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           nom: 'Quartier Test',
           commune: 'Commune Test',
-          description: 'Description du quartier test',
           userId: _auth.currentUser?.uid ?? '',
           chefPrenom: 'Prénom Test',
           chefNom: 'Nom Test',

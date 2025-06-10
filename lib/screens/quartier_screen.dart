@@ -96,7 +96,6 @@ class _QuartierScreenState extends State<QuartierScreen> {
           id: _editingQuartier?.id ?? const Uuid().v4(),
           nom: _selectedQuartier!,
           commune: _selectedCommune!,
-          description: widget.quartier?.description ?? '',
           userId: widget.quartier?.userId ?? '',
           chefPrenom: _chefPrenomController.text,
           chefNom: _chefNomController.text,
@@ -141,15 +140,8 @@ class _QuartierScreenState extends State<QuartierScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.quartier == null
-            ? 'Ajouter un Quartier'
-            : 'Modifier le Quartier'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveQuartier,
-          ),
-        ],
+        // The back button is automatically provided by Scaffold
+        automaticallyImplyLeading: true,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -162,6 +154,34 @@ class _QuartierScreenState extends State<QuartierScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // New visual header for the screen
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24.0),
+                          child: Column(
+                            children: [
+                              Icon(
+                                widget.quartier == null
+                                    ? Icons.add_location_alt_outlined
+                                    : Icons.edit_location_alt_outlined,
+                                size: 50,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                widget.quartier == null
+                                    ? 'Ajouter un Nouveau Quartier'
+                                    : 'Modifier le Quartier',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                         Card(
                           elevation: 4,
                           child: Padding(
@@ -178,12 +198,18 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 DropdownSearch<String>(
-                                  popupProps: const PopupProps.menu(
+                                  popupProps: PopupProps.menu(
                                     showSearchBox: true,
                                     searchFieldProps: TextFieldProps(
                                       decoration: InputDecoration(
                                         labelText: 'Rechercher une commune',
                                         prefixIcon: Icon(Icons.search),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
                                       ),
                                     ),
                                   ),
@@ -203,10 +229,16 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                   },
                                   selectedItem: _selectedCommune,
                                   dropdownDecoratorProps:
-                                      const DropDownDecoratorProps(
+                                      DropDownDecoratorProps(
                                     dropdownSearchDecoration: InputDecoration(
                                       labelText: 'Commune',
-                                      border: OutlineInputBorder(),
+                                      prefixIcon:
+                                          Icon(Icons.location_city_outlined),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[50],
                                     ),
                                   ),
                                   validator: (value) {
@@ -240,12 +272,18 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                     _quartiers.isNotEmpty)
                                   DropdownSearch<String>(
                                     key: ValueKey(_selectedCommune),
-                                    popupProps: const PopupProps.menu(
+                                    popupProps: PopupProps.menu(
                                       showSearchBox: true,
                                       searchFieldProps: TextFieldProps(
                                         decoration: InputDecoration(
                                           labelText: 'Rechercher un quartier',
                                           prefixIcon: Icon(Icons.search),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey[50],
                                         ),
                                       ),
                                     ),
@@ -254,10 +292,16 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                     selectedItem: _selectedQuartier,
                                     enabled: _selectedCommune != null,
                                     dropdownDecoratorProps:
-                                        const DropDownDecoratorProps(
+                                        DropDownDecoratorProps(
                                       dropdownSearchDecoration: InputDecoration(
                                         labelText: 'Quartier',
-                                        border: OutlineInputBorder(),
+                                        prefixIcon: Icon(Icons.apartment),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
                                       ),
                                     ),
                                     validator: (value) {
@@ -270,7 +314,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                 else if (_selectedCommune != null &&
                                     _quartiers.isEmpty &&
                                     !_isLoading)
-                                  const Padding(
+                                  Padding(
                                     padding:
                                         EdgeInsets.symmetric(vertical: 8.0),
                                     child: Text(
@@ -279,7 +323,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                     ),
                                   )
                                 else if (_selectedCommune == null)
-                                  const Padding(
+                                  Padding(
                                     padding:
                                         EdgeInsets.symmetric(vertical: 8.0),
                                     child: Text(
@@ -309,9 +353,14 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                 const SizedBox(height: 8),
                                 TextFormField(
                                   controller: _chefPrenomController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Prénom du Chef',
-                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.person_outline),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -323,9 +372,14 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                 const SizedBox(height: 16),
                                 TextFormField(
                                   controller: _chefNomController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Nom du Chef',
-                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.person_outline),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
                                   ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -346,11 +400,24 @@ class _QuartierScreenState extends State<QuartierScreen> {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
+                              style: TextButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
                               child: const Text('Annuler'),
                             ),
                             const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: _saveQuartier,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
                               child: Text(widget.quartier == null
                                   ? 'Ajouter'
                                   : 'Mettre à jour'),
