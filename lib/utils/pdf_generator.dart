@@ -65,7 +65,10 @@ class PdfGenerator {
           pw.SizedBox(height: 10),
           _buildInfoRow('Adresse', maison.adresse),
           _buildInfoRow('Quartier', quartier.nom),
-          _buildInfoRow('Chef de Quartier', quartier.chefQuartierId),
+          _buildInfoRow(
+            'Chef de Quartier',
+            '${quartier.chefPrenom} ${quartier.chefNom}',
+          ),
           _buildInfoRow('Propriétaire', proprietaire.nom),
         ],
       ),

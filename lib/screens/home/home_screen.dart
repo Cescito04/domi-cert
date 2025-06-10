@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/services/auth_service.dart';
 import 'package:domicert/screens/quartiers_screen.dart';
+import 'package:domicert/screens/quartier_screen.dart';
 import 'package:domicert/screens/maisons_screen.dart';
 import 'package:domicert/screens/profile_screen.dart';
 
@@ -97,13 +98,51 @@ class HomeScreen extends ConsumerWidget {
                         context,
                         icon: Icons.location_city_outlined,
                         title: 'Quartiers',
-                        description: 'Consultez les quartiers',
+                        description: 'Gérez les quartiers',
                         color: Colors.green,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const QuartiersScreen(),
+                          showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
+                            ),
+                            builder: (context) => Container(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(Icons.list),
+                                    title: const Text('Liste des quartiers'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const QuartiersScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.add),
+                                    title: const Text('Créer un quartier'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              QuartierScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
