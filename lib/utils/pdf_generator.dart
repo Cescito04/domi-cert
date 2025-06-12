@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
-import 'dart:typed_data';
 import '../models/habitant.dart';
 import '../models/maison.dart';
 import '../models/quartier.dart';

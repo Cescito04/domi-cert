@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/quartier.dart';
-import '../models/habitant.dart';
 import '../services/quartier_service.dart';
 import '../services/habitant_service.dart';
 import '../screens/quartier_screen.dart';

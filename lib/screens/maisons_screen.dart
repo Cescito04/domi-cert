@@ -229,14 +229,14 @@ class _MaisonsScreenState extends ConsumerState<MaisonsScreen> {
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Row(
+                                      content: const Row(
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.check_circle,
                                             color: Colors.white,
                                           ),
-                                          const SizedBox(width: 8),
-                                          const Text(
+                                          SizedBox(width: 8),
+                                          Text(
                                             'Maison créée avec succès',
                                           ),
                                         ],
@@ -256,14 +256,14 @@ class _MaisonsScreenState extends ConsumerState<MaisonsScreen> {
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Row(
+                                      content: const Row(
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.check_circle,
                                             color: Colors.white,
                                           ),
-                                          const SizedBox(width: 8),
-                                          const Text(
+                                          SizedBox(width: 8),
+                                          Text(
                                             'Maison mise à jour avec succès',
                                           ),
                                         ],
@@ -381,14 +381,14 @@ class _MaisonsScreenState extends ConsumerState<MaisonsScreen> {
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Row(
+                                  content: const Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.check_circle,
                                         color: Colors.white,
                                       ),
-                                      const SizedBox(width: 8),
-                                      const Text(
+                                      SizedBox(width: 8),
+                                      Text(
                                         'Maison supprimée avec succès',
                                       ),
                                     ],

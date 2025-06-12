@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/habitant.dart';
 import '../models/certificat.dart';
 import '../services/certificat_service.dart';

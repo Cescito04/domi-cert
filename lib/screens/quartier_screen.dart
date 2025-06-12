@@ -203,7 +203,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                     searchFieldProps: TextFieldProps(
                                       decoration: InputDecoration(
                                         labelText: 'Rechercher une commune',
-                                        prefixIcon: Icon(Icons.search),
+                                        prefixIcon: const Icon(Icons.search),
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -233,7 +233,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                     dropdownSearchDecoration: InputDecoration(
                                       labelText: 'Commune',
                                       prefixIcon:
-                                          Icon(Icons.location_city_outlined),
+                                          const Icon(Icons.location_city_outlined),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -277,7 +277,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                       searchFieldProps: TextFieldProps(
                                         decoration: InputDecoration(
                                           labelText: 'Rechercher un quartier',
-                                          prefixIcon: Icon(Icons.search),
+                                          prefixIcon: const Icon(Icons.search),
                                           border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(12),
@@ -295,7 +295,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                         DropDownDecoratorProps(
                                       dropdownSearchDecoration: InputDecoration(
                                         labelText: 'Quartier',
-                                        prefixIcon: Icon(Icons.apartment),
+                                        prefixIcon: const Icon(Icons.apartment),
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -314,7 +314,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                 else if (_selectedCommune != null &&
                                     _quartiers.isEmpty &&
                                     !_isLoading)
-                                  Padding(
+                                  const Padding(
                                     padding:
                                         EdgeInsets.symmetric(vertical: 8.0),
                                     child: Text(
@@ -323,7 +323,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                     ),
                                   )
                                 else if (_selectedCommune == null)
-                                  Padding(
+                                  const Padding(
                                     padding:
                                         EdgeInsets.symmetric(vertical: 8.0),
                                     child: Text(
@@ -355,7 +355,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                   controller: _chefPrenomController,
                                   decoration: InputDecoration(
                                     labelText: 'Prénom du Chef',
-                                    prefixIcon: Icon(Icons.person_outline),
+                                    prefixIcon: const Icon(Icons.person_outline),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -374,7 +374,7 @@ class _QuartierScreenState extends State<QuartierScreen> {
                                   controller: _chefNomController,
                                   decoration: InputDecoration(
                                     labelText: 'Nom du Chef',
-                                    prefixIcon: Icon(Icons.person_outline),
+                                    prefixIcon: const Icon(Icons.person_outline),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),

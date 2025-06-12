@@ -32,19 +32,125 @@ class HomeScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              try {
-                await ref.read(authServiceProvider).signOut();
-                if (context.mounted) {
-                  Navigator.pushReplacementNamed(context, '/login');
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Erreur de déconnexion: $e'),
-                      backgroundColor: Colors.red,
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    title: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.logout,
+                            color: Colors.red,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Déconnexion',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: const Text(
+                      'Êtes-vous sûr de vouloir vous déconnecter ?',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    actions: [
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                        },
+                        child: const Text(
+                          'Annuler',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                        child: const Text(
+                          'Déconnecter',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                    actionsPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                   );
+                },
+              );
+
+              if (shouldLogout == true) {
+                try {
+                  await ref.read(authServiceProvider).signOut();
+                  if (context.mounted) {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.error_outline,
+                                color: Colors.white),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text('Erreur de déconnexion: $e'),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.all(8),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -136,7 +242,7 @@ class HomeScreen extends ConsumerWidget {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              QuartierScreen(),
+                                              const QuartierScreen(),
                                         ),
                                       );
                                     },
