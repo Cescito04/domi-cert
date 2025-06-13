@@ -1,6 +1,102 @@
-# DomiCert - Residence Certificate Management
+# DomiCert
 
-DomiCert is a Flutter mobile application that enables digital management of residence certificates. The application facilitates the creation, management, and tracking of residence certificates for community residents.
+Une application Flutter pour la gestion des certificats de résidence.
+
+## Structure du Projet
+
+Le projet suit une architecture modulaire basée sur les fonctionnalités (Feature-First Architecture) :
+
+```
+lib/
+├── core/                     # Composants centraux
+│   ├── constants.dart       # Constantes globales
+│   └── theme.dart          # Configuration du thème
+├── features/               # Fonctionnalités de l'application
+│   ├── auth/              # Authentification
+│   │   ├── data/         # Services et sources de données
+│   │   ├── domain/       # Modèles et interfaces
+│   │   └── presentation/ # UI et widgets
+│   ├── neighborhood/     # Gestion des quartiers
+│   ├── house/           # Gestion des maisons
+│   ├── resident/        # Gestion des résidents
+│   ├── certificate/     # Gestion des certificats
+│   ├── profile/         # Gestion des profils
+│   └── owner/           # Gestion des propriétaires
+├── shared/              # Composants partagés
+│   ├── widgets/        # Widgets réutilisables
+│   │   ├── buttons/   # Boutons personnalisés
+│   │   ├── cards/     # Cartes d'information
+│   │   ├── forms/     # Champs de formulaire
+│   │   └── loading/   # Indicateurs de chargement
+│   └── utils/         # Utilitaires partagés
+└── main.dart          # Point d'entrée de l'application
+```
+
+## Widgets Partagés
+
+### LoadingIndicator
+Un widget de chargement réutilisable avec support pour les messages personnalisés.
+
+### InfoCard
+Une carte d'information avec titre et contenu personnalisable.
+
+### PrimaryButton
+Un bouton principal avec support pour les états de chargement et les icônes.
+
+### CustomTextField
+Un champ de texte personnalisé avec validation et style cohérent.
+
+## Tests
+
+Les tests sont organisés par fonctionnalité et type de composant :
+```
+test/
+├── shared/
+│   └── widgets/
+│       └── loading_indicator_test.dart
+└── features/
+    ├── auth/
+    ├── neighborhood/
+    └── ...
+```
+
+## Installation
+
+1. Cloner le repository
+2. Installer les dépendances :
+```bash
+flutter pub get
+```
+3. Configurer Firebase :
+   - Ajouter le fichier `google-services.json` pour Android
+   - Ajouter le fichier `GoogleService-Info.plist` pour iOS
+
+## Développement
+
+### Commandes utiles
+
+- Lancer l'application :
+```bash
+flutter run
+```
+
+- Exécuter les tests :
+```bash
+flutter test
+```
+
+- Analyser le code :
+```bash
+flutter analyze
+```
+
+### Bonnes pratiques
+
+1. Suivre la structure modulaire
+2. Utiliser les widgets partagés
+3. Documenter le code
+4. Écrire des tests
+5. Maintenir la cohérence du style
 
 ## Features
 
@@ -39,29 +135,6 @@ DomiCert is a Flutter mobile application that enables digital management of resi
 - Dart SDK (version 2.12.0 or higher)
 - Configured Firebase project
 - Android Studio / VS Code with Flutter extensions
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-username/domi-cert.git
-```
-
-2. Install dependencies:
-```bash
-flutter pub get
-```
-
-3. Configure Firebase:
-   - Create a Firebase project
-   - Add your Android/iOS application
-   - Download and add the configuration file
-   - Enable Authentication and Firestore
-
-4. Launch the application:
-```bash
-flutter run
-```
 
 ## Project Structure
 

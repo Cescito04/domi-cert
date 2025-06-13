@@ -1,37 +1,38 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:domicert/screens/auth/login_screen.dart';
-import 'package:domicert/screens/auth/register_screen.dart';
-import 'package:domicert/screens/auth/google_signin_phone_screen.dart';
-import 'package:domicert/screens/home/home_screen.dart';
-import 'package:domicert/screens/maisons_screen.dart';
-import 'package:domicert/screens/quartiers_screen_list.dart';
-import 'package:domicert/screens/habitants_screen.dart';
-import 'package:domicert/screens/habitant_details_screen.dart';
-import 'package:domicert/screens/profile_screen.dart';
-import 'package:domicert/screens/certificat_screen.dart';
-import 'package:domicert/services/auth_service.dart';
+import 'package:domicert/features/auth/presentation/screens/login_screen.dart';
+import 'package:domicert/features/auth/presentation/screens/register_screen.dart';
+import 'package:domicert/features/auth/presentation/screens/google_signin_phone_screen.dart';
+import 'package:domicert/features/home/presentation/screens/home_screen.dart';
+import 'package:domicert/features/house/presentation/screens/maisons_screen.dart';
+import 'package:domicert/features/neighborhood/presentation/screens/quartiers_screen_list.dart';
+import 'package:domicert/features/resident/presentation/screens/habitants_screen.dart';
+import 'package:domicert/features/resident/presentation/screens/habitant_details_screen.dart';
+import 'package:domicert/features/profile/presentation/screens/profile_screen.dart';
+import 'package:domicert/features/certificate/presentation/screens/certificat_screen.dart';
+import 'package:domicert/features/auth/data/services/auth_service.dart';
+import 'package:domicert/core/constants.dart';
+import 'package:domicert/core/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Initialiser Firebase
     await Firebase.initializeApp();
     print('Firebase initialisé avec succès');
 
-    // Configurer Firestore
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
 
-    // Test de connexion à Firestore
     print('Tentative de connexion à Firestore...');
-    await FirebaseFirestore.instance.collection('quartiers').limit(1).get();
+    await FirebaseFirestore.instance
+        .collection(quartiersCollection)
+        .limit(1)
+        .get();
     print('Connexion à Firestore réussie !');
   } catch (e, stackTrace) {
     print('Erreur Firebase: $e');
@@ -50,56 +51,9 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'DomiCert',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1E88E5),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.grey[50],
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF1E88E5), width: 2),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.red, width: 2),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1E88E5),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
-      ),
+      title: appName,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
       home: authState.when(
         data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
@@ -107,7 +61,7 @@ class MyApp extends ConsumerWidget {
           body: Center(child: CircularProgressIndicator()),
         ),
         error: (error, stack) =>
-            Scaffold(body: Center(child: Text('Erreur: $error'))),
+            Scaffold(body: Center(child: Text(genericErrorMessage))),
       ),
       routes: {
         '/maisons': (context) => const MaisonsScreen(),
