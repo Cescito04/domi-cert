@@ -1,11 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:domicert/features/house/domain/models/maison.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:domicert/core/services/cascade_deletion_service.dart';
+
+final maisonServiceProvider = Provider((ref) => MaisonService());
 
 class MaisonService {
   final CollectionReference _maisonsCollection =
       FirebaseFirestore.instance.collection('maisons');
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CascadeDeletionService _cascadeDeletionService =
+      CascadeDeletionService();
 
   // Créer une nouvelle maison
   Future<void> createMaison(Maison maison) async {
@@ -82,7 +88,7 @@ class MaisonService {
         if (maison.userId != user.uid) {
           throw Exception('Accès non autorisé à cette maison');
         }
-        await _maisonsCollection.doc(id).delete();
+        await _cascadeDeletionService.deleteMaisonCascade(id);
       }
     } catch (e) {
       throw Exception('Erreur lors de la suppression de la maison: $e');

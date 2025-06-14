@@ -3,9 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
 import 'package:domicert/features/resident/data/services/habitant_service.dart';
 import 'package:domicert/features/neighborhood/presentation/screens/quartier_screen.dart';
+import 'package:domicert/features/house/data/services/maison_service.dart';
+import 'package:domicert/features/certificate/data/services/certificat_service.dart';
+import 'package:domicert/core/services/cascade_deletion_service.dart';
 
 final quartierServiceProvider = Provider((ref) => QuartierService());
 final habitantServiceProvider = Provider((ref) => HabitantService());
+final cascadeDeletionServiceProvider =
+    Provider((ref) => CascadeDeletionService());
 
 class QuartiersScreen extends ConsumerStatefulWidget {
   const QuartiersScreen({super.key});
@@ -20,20 +25,35 @@ class _QuartiersScreenState extends ConsumerState<QuartiersScreen> {
     super.dispose();
   }
 
-  Future<void> _deleteQuartier(String id) async {
-    try {
-      await ref.read(quartierServiceProvider).deleteQuartier(id);
-      ref.invalidate(quartiersStreamProvider);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quartier supprimé avec succès')),
+  Future<void> _deleteQuartier(String quartierId) async {
+    final confirmed = await ref
+        .read(cascadeDeletionServiceProvider)
+        .showDeleteConfirmationDialog(
+          context,
+          'Supprimer le quartier',
+          'Êtes-vous sûr de vouloir supprimer ce quartier ? Cette action supprimera également toutes les maisons, habitants et certificats associés.',
         );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: ${e.toString()}')),
-        );
+
+    if (confirmed) {
+      try {
+        await ref.read(quartierServiceProvider).deleteQuartier(quartierId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Quartier supprimé avec succès'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur lors de la suppression: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

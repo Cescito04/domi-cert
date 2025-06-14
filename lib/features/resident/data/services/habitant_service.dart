@@ -1,12 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:domicert/features/resident/domain/models/habitant.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:domicert/core/services/cascade_deletion_service.dart';
+
+final habitantServiceProvider = Provider((ref) => HabitantService());
 
 class HabitantService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference _habitantsCollection =
       FirebaseFirestore.instance.collection('habitants');
+  final CascadeDeletionService _cascadeDeletionService =
+      CascadeDeletionService();
 
   // Create a new habitant
   Future<void> createHabitant(Habitant habitant) async {
@@ -82,7 +88,7 @@ class HabitantService {
       throw Exception('Accès non autorisé');
     }
 
-    await _habitantsCollection.doc(id).delete();
+    await _cascadeDeletionService.deleteHabitantCascade(id);
   }
 
   // Get habitants by maison

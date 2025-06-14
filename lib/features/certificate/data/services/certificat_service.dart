@@ -3,11 +3,20 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/features/certificate/domain/models/certificat.dart';
 import 'package:domicert/features/resident/data/services/habitant_service.dart';
 import 'package:domicert/features/house/data/services/maison_service.dart';
 import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
 import 'package:domicert/features/owner/data/services/proprietaire_service.dart';
+
+final certificatServiceProvider =
+    Provider<CertificatService>((ref) => CertificatService(
+          ref.read(habitantServiceProvider),
+          ref.read(maisonServiceProvider),
+          ref.read(quartierServiceProvider),
+          ref.read(proprietaireServiceProvider),
+        ));
 
 class CertificatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -15,10 +24,17 @@ class CertificatService {
   final CollectionReference _certificatsCollection =
       FirebaseFirestore.instance.collection('certificats');
 
-  final HabitantService _habitantService = HabitantService();
-  final MaisonService _maisonService = MaisonService();
-  final QuartierService _quartierService = QuartierService();
-  final ProprietaireService _proprietaireService = ProprietaireService();
+  final HabitantService _habitantService;
+  final MaisonService _maisonService;
+  final QuartierService _quartierService;
+  final ProprietaireService _proprietaireService;
+
+  CertificatService(
+    this._habitantService,
+    this._maisonService,
+    this._quartierService,
+    this._proprietaireService,
+  );
 
   // Créer un nouveau certificat
   Future<Certificat> createCertificat(String habitantId, File pdfFile) async {

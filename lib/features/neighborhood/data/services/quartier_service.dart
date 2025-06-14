@@ -2,13 +2,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/features/neighborhood/domain/models/quartier.dart';
+import 'package:domicert/core/services/cascade_deletion_service.dart';
 
-final quartierServiceProvider = Provider((ref) => QuartierService());
+// Removed imports for MaisonService, HabitantService, CertificatService as they are not needed for QuartierService's direct Firestore operations.
+
+final quartierServiceProvider =
+    Provider<QuartierService>((ref) => QuartierService());
 
 class QuartierService {
   final CollectionReference _quartiersCollection =
       FirebaseFirestore.instance.collection('quartiers');
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CascadeDeletionService _cascadeDeletionService =
+      CascadeDeletionService();
+
+  // Removed injected service fields as QuartierService performs direct Firestore operations for cascade deletion.
+  // final MaisonService _maisonService;
+  // final HabitantService _habitantService;
+  // final CertificatService _certificatService;
+
+  QuartierService(); // Reverted to a no-argument constructor.
 
   Future<void> createQuartier(Quartier quartier) async {
     try {
@@ -76,12 +90,10 @@ class QuartierService {
       final doc = await _quartiersCollection.doc(id).get();
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        final quartier = Quartier.fromJson(data);
-        if (quartier.userId != user.uid) {
+        if (data['userId'] != user.uid) {
           throw Exception('Accès non autorisé à ce quartier');
         }
-        await _quartiersCollection.doc(id).delete();
+        await _cascadeDeletionService.deleteQuartierCascade(id);
       }
     } catch (e) {
       throw Exception('Erreur lors de la suppression du quartier: $e');

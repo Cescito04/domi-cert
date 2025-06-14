@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/features/resident/domain/models/habitant.dart';
 import 'package:domicert/features/house/domain/models/maison.dart';
 import 'package:domicert/features/neighborhood/domain/models/quartier.dart';
 import 'package:domicert/features/resident/data/services/habitant_service.dart';
 import 'package:domicert/features/house/data/services/maison_service.dart';
 import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
+import 'package:domicert/core/services/cascade_deletion_service.dart';
 
-class HabitantsScreen extends StatefulWidget {
+class HabitantsScreen extends ConsumerStatefulWidget {
   const HabitantsScreen({super.key});
 
   @override
-  State<HabitantsScreen> createState() => _HabitantsScreenState();
+  ConsumerState<HabitantsScreen> createState() => _HabitantsScreenState();
 }
 
-class _HabitantsScreenState extends State<HabitantsScreen> {
+class _HabitantsScreenState extends ConsumerState<HabitantsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _habitantService = HabitantService();
   final _maisonService = MaisonService();
@@ -319,19 +321,35 @@ class _HabitantsScreenState extends State<HabitantsScreen> {
     );
   }
 
-  Future<void> _deleteHabitant(String id) async {
-    try {
-      await _habitantService.deleteHabitant(id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Habitant supprimé avec succès')),
+  Future<void> _deleteHabitant(String habitantId) async {
+    final confirmed = await ref
+        .read(cascadeDeletionServiceProvider)
+        .showDeleteConfirmationDialog(
+          context,
+          'Supprimer l\'habitant',
+          'Êtes-vous sûr de vouloir supprimer cet habitant ? Cette action supprimera également tous les certificats associés.',
         );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: ${e.toString()}')),
-        );
+
+    if (confirmed) {
+      try {
+        await _habitantService.deleteHabitant(habitantId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Habitant supprimé avec succès'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur lors de la suppression: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

@@ -3,6 +3,9 @@ import 'package:domicert/features/resident/domain/models/habitant.dart';
 import 'package:domicert/features/certificate/domain/models/certificat.dart';
 import 'package:domicert/features/certificate/data/services/certificat_service.dart';
 import 'package:domicert/features/resident/data/services/habitant_service.dart';
+import 'package:domicert/features/house/data/services/maison_service.dart';
+import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
+import 'package:domicert/features/owner/data/services/proprietaire_service.dart';
 import 'package:domicert/features/certificate/utils/pdf_generator.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -17,8 +20,11 @@ class CertificatScreen extends StatefulWidget {
 }
 
 class _CertificatScreenState extends State<CertificatScreen> {
-  final _certificatService = CertificatService();
-  final _habitantService = HabitantService();
+  late final HabitantService _habitantService;
+  late final MaisonService _maisonService;
+  late final QuartierService _quartierService;
+  late final ProprietaireService _proprietaireService;
+  late final CertificatService _certificatService;
   Habitant? _selectedHabitant;
   bool _isGenerating = false;
   List<Habitant> _habitants = [];
@@ -26,6 +32,16 @@ class _CertificatScreenState extends State<CertificatScreen> {
   @override
   void initState() {
     super.initState();
+    _habitantService = HabitantService();
+    _maisonService = MaisonService();
+    _quartierService = QuartierService();
+    _proprietaireService = ProprietaireService();
+    _certificatService = CertificatService(
+      _habitantService,
+      _maisonService,
+      _quartierService,
+      _proprietaireService,
+    );
     _loadHabitants();
   }
 

@@ -6,6 +6,7 @@ import 'package:domicert/features/house/domain/models/maison.dart';
 import 'package:domicert/features/neighborhood/domain/models/quartier.dart';
 import 'package:domicert/features/house/data/services/maison_service.dart';
 import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
+import 'package:domicert/core/services/cascade_deletion_service.dart';
 
 final maisonServiceProvider = Provider((ref) => MaisonService());
 final quartierServiceProvider = Provider((ref) => QuartierService());
@@ -173,7 +174,8 @@ class _MaisonsScreenState extends ConsumerState<MaisonsScreen> {
                           items: proprietaires.map((proprietaire) {
                             return DropdownMenuItem(
                               value: proprietaire.id,
-                              child: Text(proprietaire.nom),
+                              child: Text(
+                                  '${proprietaire.prenom} ${proprietaire.nom}'),
                             );
                           }).toList(),
                           onChanged: (value) {
@@ -320,125 +322,37 @@ class _MaisonsScreenState extends ConsumerState<MaisonsScreen> {
     );
   }
 
-  void _deleteMaison(Maison maison) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.delete_outline,
-                  size: 32,
-                  color: Colors.red,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Confirmer la suppression',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Êtes-vous sûr de vouloir supprimer la maison à l\'adresse "${maison.adresse}" ?',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Annuler'),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await ref
-                            .read(maisonServiceProvider)
-                            .deleteMaison(maison.id);
-                        if (mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Row(
-                                children: [
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Maison supprimée avec succès',
-                                  ),
-                                ],
-                              ),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.error_outline,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text('Erreur: ${e.toString()}'),
-                                ],
-                              ),
-                              backgroundColor: Colors.red,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Supprimer'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<void> _deleteMaison(String maisonId) async {
+    final confirmed = await ref
+        .read(cascadeDeletionServiceProvider)
+        .showDeleteConfirmationDialog(
+          context,
+          'Supprimer la maison',
+          'Êtes-vous sûr de vouloir supprimer cette maison ? Cette action supprimera également tous les habitants et certificats associés.',
+        );
+
+    if (confirmed) {
+      try {
+        await ref.read(maisonServiceProvider).deleteMaison(maisonId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Maison supprimée avec succès'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur lors de la suppression: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -613,7 +527,7 @@ class _MaisonsScreenState extends ConsumerState<MaisonsScreen> {
                         if (value == 'edit') {
                           _showMaisonDialog(maison);
                         } else if (value == 'delete') {
-                          _deleteMaison(maison);
+                          _deleteMaison(maison.id);
                         }
                       },
                     ),

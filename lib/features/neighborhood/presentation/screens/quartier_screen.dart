@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:domicert/features/neighborhood/domain/models/quartier.dart';
 import 'package:domicert/features/neighborhood/domain/models/recensement_data.dart';
@@ -6,16 +7,16 @@ import 'package:domicert/features/neighborhood/data/services/quartier_service.da
 import 'package:domicert/features/neighborhood/data/services/recensement_service.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-class QuartierScreen extends StatefulWidget {
+class QuartierScreen extends ConsumerStatefulWidget {
   final Quartier? quartier;
 
   const QuartierScreen({super.key, this.quartier});
 
   @override
-  State<QuartierScreen> createState() => _QuartierScreenState();
+  ConsumerState<QuartierScreen> createState() => _QuartierScreenState();
 }
 
-class _QuartierScreenState extends State<QuartierScreen> {
+class _QuartierScreenState extends ConsumerState<QuartierScreen> {
   final _formKey = GlobalKey<FormState>();
   final _quartierService = QuartierService();
   final _recensementService = RecensementService();
@@ -32,20 +33,14 @@ class _QuartierScreenState extends State<QuartierScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _initializeData();
 
     if (widget.quartier != null) {
       _editingQuartier = widget.quartier;
       _selectedCommune = widget.quartier!.commune;
       _selectedQuartier = widget.quartier!.nom;
-
       _chefPrenomController.text = widget.quartier!.chefPrenom;
       _chefNomController.text = widget.quartier!.chefNom;
-
-      if (_selectedCommune != null && _selectedCommune!.isNotEmpty) {
-        _quartiers =
-            _recensementService.getQuartiersForCommune(_selectedCommune!);
-      }
     }
   }
 
@@ -56,18 +51,45 @@ class _QuartierScreenState extends State<QuartierScreen> {
     super.dispose();
   }
 
-  Future<void> _loadData() async {
+  Future<void> _initializeData() async {
     try {
       await _recensementService.loadData();
       setState(() {
         _communes = _recensementService.getCommunes();
+        if (_selectedCommune != null && _selectedCommune!.isNotEmpty) {
+          _quartiers =
+              _recensementService.getQuartiersForCommune(_selectedCommune!);
+        }
         _isLoading = false;
       });
     } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors du chargement des données: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _loadQuartiersForCommune(String commune) async {
+    try {
+      final quartiers =
+          await _recensementService.getQuartiersForCommune(commune);
       setState(() {
-        _error = e.toString();
-        _isLoading = false;
+        _quartiers = quartiers;
       });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors du chargement des quartiers: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
