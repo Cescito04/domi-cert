@@ -1,218 +1,100 @@
-# DomiCert
+# Domicert
 
-Une application Flutter pour la gestion des certificats de résidence.
+## Description
 
-## Structure du Projet
+Domicert est une application mobile développée avec Flutter. Elle vise à [**Décrivez ici l'objectif principal de votre application et ce qu'elle fait.**].
 
-Le projet suit une architecture modulaire basée sur les fonctionnalités (Feature-First Architecture) :
+## Fonctionnalités
 
-```
-lib/
-├── core/                     # Composants centraux
-│   ├── constants.dart       # Constantes globales
-│   └── theme.dart          # Configuration du thème
-├── features/               # Fonctionnalités de l'application
-│   ├── auth/              # Authentification
-│   │   ├── data/         # Services et sources de données
-│   │   ├── domain/       # Modèles et interfaces
-│   │   └── presentation/ # UI et widgets
-│   ├── neighborhood/     # Gestion des quartiers
-│   ├── house/           # Gestion des maisons
-│   ├── resident/        # Gestion des résidents
-│   ├── certificate/     # Gestion des certificats
-│   ├── profile/         # Gestion des profils
-│   └── owner/           # Gestion des propriétaires
-├── shared/              # Composants partagés
-│   ├── widgets/        # Widgets réutilisables
-│   │   ├── buttons/   # Boutons personnalisés
-│   │   ├── cards/     # Cartes d'information
-│   │   ├── forms/     # Champs de formulaire
-│   │   └── loading/   # Indicateurs de chargement
-│   └── utils/         # Utilitaires partagés
-└── main.dart          # Point d'entrée de l'application
-```
+*   **Authentication**: Gestion de la connexion et de l'inscription des utilisateurs.
+*   **Home**: Tableau de bord principal ou page d'accueil.
+*   **Profile**: Gestion du profil utilisateur.
+*   **Certificate**: Gestion ou émission de certificats.
+*   **Resident**: Gestion des informations des résidents.
+*   **Neighborhood**: Fonctionnalités liées au quartier.
+*   **House**: Gestion des maisons.
+*   **Owner**: Gestion des propriétaires.
 
-## Widgets Partagés
+## Technologies Utilisées
 
-### LoadingIndicator
-Un widget de chargement réutilisable avec support pour les messages personnalisés.
+*   Flutter
+*   Dart
+*   Firebase (Core, Auth, Firestore, Storage, Messaging, Analytics, Google Sign-In, UI Auth)
+*   Flutter Riverpod (State Management)
+*   Google Fonts, Flutter Spinkit, PDF, Path Provider, URL Launcher, Dropdown Search (UI Components)
 
-### InfoCard
-Une carte d'information avec titre et contenu personnalisable.
+## Prérequis
 
-### PrimaryButton
-Un bouton principal avec support pour les états de chargement et les icônes.
+Assurez-vous d'avoir les éléments suivants installés sur votre machine :
 
-### CustomTextField
-Un champ de texte personnalisé avec validation et style cohérent.
-
-## Tests
-
-Les tests sont organisés par fonctionnalité et type de composant :
-```
-test/
-├── shared/
-│   └── widgets/
-│       └── loading_indicator_test.dart
-└── features/
-    ├── auth/
-    ├── neighborhood/
-    └── ...
-```
+*   [Flutter SDK](https://flutter.dev/docs/get-started/install)
+*   [VS Code](https://code.visualstudio.com/) ou [Android Studio](https://developer.android.com/studio) avec le plugin Flutter
 
 ## Installation
 
-1. Cloner le repository
-2. Installer les dépendances :
-```bash
-flutter pub get
-```
-3. Configurer Firebase :
-   - Ajouter le fichier `google-services.json` pour Android
-   - Ajouter le fichier `GoogleService-Info.plist` pour iOS
+Suivez ces étapes pour configurer le projet localement.
 
-## Développement
+1.  **Cloner le dépôt**
+    ```bash
+    git clone <URL_DU_VOTRE_DEPOT>
+    cd domi-cert
+    ```
 
-### Commandes utiles
+2.  **Installer les dépendances**
+    ```bash
+    flutter pub get
+    ```
 
-- Lancer l'application :
-```bash
-flutter run
-```
+3.  **Lancer l'application**
+    ```bash
+    flutter run
+    ```
+    Ou ouvrez le projet dans votre IDE (VS Code, Android Studio) et lancez-le à partir de là.
 
-- Exécuter les tests :
-```bash
-flutter test
-```
-
-- Analyser le code :
-```bash
-flutter analyze
-```
-
-### Bonnes pratiques
-
-1. Suivre la structure modulaire
-2. Utiliser les widgets partagés
-3. Documenter le code
-4. Écrire des tests
-5. Maintenir la cohérence du style
-
-## Features
-
-### Neighborhood Management
-- Create and modify neighborhoods
-- Assign neighborhood chiefs
-- View existing neighborhoods
-- Delete neighborhoods
-
-### House Management
-- Register houses by neighborhood
-- Associate owners with houses
-- Track addresses
-- Manage detailed information
-
-### Resident Management
-- Register residents
-- Associate residents with houses
-- Track personal information
-- Manage residents per house
-
-### Residence Certificates
-- Generate residence certificates
-- View certificates in PDF format
-- Track certificate validity
-- Cancel and delete certificates
-
-### User Profile
-- Display personal statistics
-- Track number of houses and residents
-- Manage personal information
-
-## Prerequisites
-
-- Flutter SDK (version 2.0.0 or higher)
-- Dart SDK (version 2.12.0 or higher)
-- Configured Firebase project
-- Android Studio / VS Code with Flutter extensions
-
-## Project Structure
+## Structure du Projet
 
 ```
 lib/
-├── models/          # Data models
-├── screens/         # Application screens
-├── services/        # Services (Firebase, etc.)
-├── utils/           # Utilities
-└── widgets/         # Reusable widgets
+├── main.dart
+├── features/
+│   ├── auth/
+│   ├── home/
+│   ├── profile/
+│   ├── certificate/
+│   ├── resident/
+│   ├── neighborhood/
+│   ├── house/
+│   └── owner/
+├── core/
+│   ├── services/
+│   ├── constants.dart
+│   └── theme.dart
+└── shared/
+    └── widgets/
 ```
 
-## Firebase Configuration
+*   `lib/main.dart`: Le point d'entrée de l'application.
+*   `lib/features/`: Contient les différentes fonctionnalités de l'application.
+*   `lib/core/`: Contient les services, constantes et thèmes de l'application.
+*   `lib/shared/`: Contient les composants UI réutilisables.
 
-1. Create a Firebase project
-2. Enable the following services:
-   - Authentication
-   - Cloud Firestore
-   - Storage (for PDFs)
+## Contribution
 
-3. Configure Firestore security rules:
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
+Les contributions sont les bienvenues ! Veuillez suivre ces étapes :
 
-## Usage
+1.  Faites un "fork" du dépôt.
+2.  Créez une nouvelle branche (`git checkout -b feature/AmazingFeature`).
+3.  Faites vos modifications.
+4.  Commitez vos changements (`git commit -m 'Add some AmazingFeature'`).
+5.  Poussez vers la branche (`git push origin feature/AmazingFeature`).
+6.  Ouvrez une "Pull Request".
 
-### Creating a Certificate
-1. Navigate to the certificates screen
-2. Select a resident
-3. Click "Generate Certificate"
-4. The certificate will be generated and available as PDF
+## Licence
 
-### Managing Neighborhoods
-1. Navigate to the neighborhoods screen
-2. Use the "+" button to create a new neighborhood
-3. Fill in the required information
-4. Save the neighborhood
+Ce projet est sous licence [**Nom de la licence, ex: MIT**]. Voir le fichier `LICENSE` pour plus de détails.
 
-### Managing Residents
-1. Navigate to the residents screen
-2. Add a new resident
-3. Associate them with a house
-4. Save the information
+## Contact
 
-## Contributing
+Votre Nom - votre_email@example.com
 
-Contributions are welcome! To contribute:
-
-1. Fork the project
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Support
-
-For questions or issues, please:
-- Open an issue on GitHub
-- Contact the support team at support@domicert.com
-
-## Authors
-
-- Your Name - Lead Developer
-
-## Acknowledgments
-
-- Flutter Team
-- Firebase Team
-- All contributors
+Lien du Projet : [https://github.com/votre_utilisateur/domi-cert](https://github.com/votre_utilisateur/domi-cert)

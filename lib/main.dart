@@ -61,7 +61,7 @@ class MyApp extends ConsumerWidget {
           body: Center(child: CircularProgressIndicator()),
         ),
         error: (error, stack) =>
-            Scaffold(body: Center(child: Text(genericErrorMessage))),
+            const Scaffold(body: Center(child: Text(genericErrorMessage))),
       ),
       routes: {
         '/maisons': (context) => const MaisonsScreen(),

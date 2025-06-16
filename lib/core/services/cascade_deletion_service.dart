@@ -2,10 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:domicert/features/neighborhood/domain/models/quartier.dart';
-import 'package:domicert/features/house/domain/models/maison.dart';
-import 'package:domicert/features/resident/domain/models/habitant.dart';
-import 'package:domicert/features/certificate/domain/models/certificat.dart';
 
 final cascadeDeletionServiceProvider =
     Provider((ref) => CascadeDeletionService());

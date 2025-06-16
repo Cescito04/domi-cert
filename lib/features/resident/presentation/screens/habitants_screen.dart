@@ -63,7 +63,7 @@ class _HabitantsScreenState extends ConsumerState<HabitantsScreen> {
           _maisons = maisons;
           if (_editingHabitant != null && _selectedMaisonId != null) {
             final maisonExists =
-                maisons.any((m) => (m as Maison).id == _selectedMaisonId);
+                maisons.any((m) => (m).id == _selectedMaisonId);
             if (!maisonExists) {
               _selectedMaisonId = null;
             }

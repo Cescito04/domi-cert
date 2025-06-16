@@ -77,7 +77,7 @@ class _QuartierScreenState extends ConsumerState<QuartierScreen> {
   Future<void> _loadQuartiersForCommune(String commune) async {
     try {
       final quartiers =
-          await _recensementService.getQuartiersForCommune(commune);
+          _recensementService.getQuartiersForCommune(commune);
       setState(() {
         _quartiers = quartiers;
       });

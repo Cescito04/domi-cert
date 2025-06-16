@@ -51,11 +51,11 @@ class Certificat {
 
   static DateTime _parseFirestoreDate(dynamic date) {
     if (date == null) {
-      return DateTime.now(); // Provide a default or handle as an error
+      return DateTime.now();
     } else if (date is Timestamp) {
       return date.toDate();
     } else if (date is String) {
-      return DateTime.parse(date); // Assuming ISO 8601 string format
+      return DateTime.parse(date);
     } else {
       throw FormatException('Unexpected date type: ${date.runtimeType}');
     }

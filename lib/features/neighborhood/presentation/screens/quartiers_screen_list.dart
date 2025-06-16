@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
 import 'package:domicert/features/resident/data/services/habitant_service.dart';
 import 'package:domicert/features/neighborhood/presentation/screens/quartier_screen.dart';
-import 'package:domicert/features/house/data/services/maison_service.dart';
-import 'package:domicert/features/certificate/data/services/certificat_service.dart';
 import 'package:domicert/core/services/cascade_deletion_service.dart';
 
 final quartierServiceProvider = Provider((ref) => QuartierService());
