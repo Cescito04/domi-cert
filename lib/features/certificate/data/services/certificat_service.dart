@@ -36,26 +36,22 @@ class CertificatService {
     this._proprietaireService,
   );
 
-  // Créer un nouveau certificat
   Future<Certificat> createCertificat(String habitantId, File pdfFile) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Utilisateur non connecté');
 
-    // Générer un ID unique pour le certificat
     final certificatId = const Uuid().v4();
 
     try {
-      // Convertir le fichier PDF en base64
       final bytes = await pdfFile.readAsBytes();
       final base64Pdf = base64Encode(bytes);
 
-      // Créer le document certificat dans Firestore
       final now = DateTime.now();
       final dateExpiration = DateTime(
         now.year + 1,
         now.month,
         now.day,
-      ); // Valide 1 an
+      );
 
       final certificat = Certificat(
         id: certificatId,
@@ -75,7 +71,7 @@ class CertificatService {
     }
   }
 
-  // Obtenir tous les certificats de l'utilisateur
+
   Stream<List<Certificat>> getCertificats() {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Utilisateur non connecté');
@@ -95,7 +91,7 @@ class CertificatService {
         );
   }
 
-  // Obtenir un certificat spécifique
+
   Future<Certificat> getCertificat(String id) async {
     final doc = await _certificatsCollection.doc(id).get();
     if (!doc.exists) throw Exception('Certificat non trouvé');
@@ -109,7 +105,7 @@ class CertificatService {
     return Certificat.fromMap(data, doc.id);
   }
 
-  // Annuler un certificat
+
   Future<void> annulerCertificat(String id) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Utilisateur non connecté');
@@ -127,7 +123,6 @@ class CertificatService {
     });
   }
 
-  // Supprimer un certificat
   Future<void> deleteCertificat(String id) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Utilisateur non connecté');
@@ -140,11 +135,10 @@ class CertificatService {
       throw Exception('Accès non autorisé');
     }
 
-    // Supprimer le document du certificat
     await _certificatsCollection.doc(id).delete();
   }
 
-  // Obtenir les informations complètes pour la génération du PDF
+
   Future<Map<String, dynamic>> getCertificatData(String habitantId) async {
     final habitant = await _habitantService.getHabitant(habitantId);
     final maison = await _maisonService.getMaison(habitant.maisonId);
