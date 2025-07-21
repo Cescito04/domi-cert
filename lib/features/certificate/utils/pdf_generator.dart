@@ -7,6 +7,8 @@ import 'package:domicert/features/resident/domain/models/habitant.dart';
 import 'package:domicert/features/house/domain/models/maison.dart';
 import 'package:domicert/features/neighborhood/domain/models/quartier.dart';
 import 'package:domicert/features/owner/domain/models/proprietaire.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:ui' as ui;
 
 class PdfGenerator {
   static Future<File> generateCertificate({
@@ -14,6 +16,7 @@ class PdfGenerator {
     required Maison maison,
     required Quartier quartier,
     required Proprietaire proprietaire,
+    String? certificatId,
   }) async {
     final pdf = pw.Document();
 
@@ -120,6 +123,33 @@ class PdfGenerator {
       ),
     );
 
+    // Génération du QR code si certificatId fourni
+    pw.Widget? qrWidget;
+    if (certificatId != null) {
+      final qrValidationUrl =
+          'https://domicert-53795.web.app/certificat/verify/$certificatId';
+      // Générer le QR code en tant qu'image PNG
+      final qrValidationPainter = QrPainter(
+        data: qrValidationUrl,
+        version: QrVersions.auto,
+        gapless: false,
+      );
+      final picData = await qrValidationPainter.toImageData(200,
+          format: ui.ImageByteFormat.png);
+      if (picData != null) {
+        final qrBytes = picData.buffer.asUint8List();
+        final qrImage = pw.MemoryImage(qrBytes);
+        qrWidget = pw.Column(children: [
+          pw.Text('Vérifiez ce certificat en scannant ce QR code :',
+              style: pw.TextStyle(fontSize: 12)),
+          pw.SizedBox(height: 8),
+          pw.Image(qrImage, width: 100, height: 100),
+          pw.SizedBox(height: 8),
+          pw.Text(qrValidationUrl, style: pw.TextStyle(fontSize: 8)),
+        ]);
+      }
+    }
+
     // Assemblage du document
     pdf.addPage(
       pw.MultiPage(
@@ -132,6 +162,10 @@ class PdfGenerator {
               children: [
                 header,
                 body,
+                if (qrWidget != null) ...[
+                  pw.SizedBox(height: 24),
+                  qrWidget,
+                ],
                 footer,
               ],
             ),

@@ -9,6 +9,7 @@ import 'package:domicert/features/resident/data/services/habitant_service.dart';
 import 'package:domicert/features/house/data/services/maison_service.dart';
 import 'package:domicert/features/neighborhood/data/services/quartier_service.dart';
 import 'package:domicert/features/owner/data/services/proprietaire_service.dart';
+import 'package:domicert/features/certificate/utils/pdf_generator.dart';
 
 final certificatServiceProvider =
     Provider<CertificatService>((ref) => CertificatService(
@@ -43,7 +44,16 @@ class CertificatService {
     final certificatId = const Uuid().v4();
 
     try {
-      final bytes = await pdfFile.readAsBytes();
+      // Générer le PDF avec QR code
+      final data = await getCertificatData(habitantId);
+      final pdfWithQr = await PdfGenerator.generateCertificate(
+        habitant: data['habitant'],
+        maison: data['maison'],
+        quartier: data['quartier'],
+        proprietaire: data['proprietaire'],
+        certificatId: certificatId,
+      );
+      final bytes = await pdfWithQr.readAsBytes();
       final base64Pdf = base64Encode(bytes);
 
       final now = DateTime.now();
@@ -71,7 +81,6 @@ class CertificatService {
     }
   }
 
-
   Stream<List<Certificat>> getCertificats() {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Utilisateur non connecté');
@@ -91,7 +100,6 @@ class CertificatService {
         );
   }
 
-
   Future<Certificat> getCertificat(String id) async {
     final doc = await _certificatsCollection.doc(id).get();
     if (!doc.exists) throw Exception('Certificat non trouvé');
@@ -104,7 +112,6 @@ class CertificatService {
 
     return Certificat.fromMap(data, doc.id);
   }
-
 
   Future<void> annulerCertificat(String id) async {
     final user = _auth.currentUser;
@@ -137,7 +144,6 @@ class CertificatService {
 
     await _certificatsCollection.doc(id).delete();
   }
-
 
   Future<Map<String, dynamic>> getCertificatData(String habitantId) async {
     final habitant = await _habitantService.getHabitant(habitantId);

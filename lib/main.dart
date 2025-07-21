@@ -11,16 +11,20 @@ import 'package:domicert/features/resident/presentation/screens/habitants_screen
 import 'package:domicert/features/resident/presentation/screens/habitant_details_screen.dart';
 import 'package:domicert/features/profile/presentation/screens/profile_screen.dart';
 import 'package:domicert/features/certificate/presentation/screens/certificat_screen.dart';
+import 'package:domicert/features/certificate/presentation/screens/certificat_verification_screen.dart';
 import 'package:domicert/features/auth/data/services/auth_service.dart';
 import 'package:domicert/core/constants.dart';
 import 'package:domicert/core/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     print('Firebase initialisé avec succès');
 
     FirebaseFirestore.instance.settings = const Settings(
@@ -29,10 +33,7 @@ void main() async {
     );
 
     print('Tentative de connexion à Firestore...');
-    await FirebaseFirestore.instance
-        .collection(quartiersCollection)
-        .limit(1)
-        .get();
+    await FirebaseFirestore.instance.collection('certificats').limit(1).get();
     print('Connexion à Firestore réussie !');
   } catch (e, stackTrace) {
     print('Erreur Firebase: $e');
@@ -45,6 +46,13 @@ void main() async {
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
+  bool isVerificationUrl() {
+    final uri = Uri.base;
+    return uri.pathSegments.length >= 3 &&
+        uri.pathSegments[0] == 'certificat' &&
+        uri.pathSegments[1] == 'verify';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
@@ -55,14 +63,17 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: authState.when(
-        data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
-        loading: () => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (error, stack) =>
-            const Scaffold(body: Center(child: Text(genericErrorMessage))),
-      ),
+      home: isVerificationUrl()
+          ? const CertificatVerificationScreen()
+          : authState.when(
+              data: (user) =>
+                  user != null ? const HomeScreen() : const LoginScreen(),
+              loading: () => const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+              error: (error, stack) => const Scaffold(
+                  body: Center(child: Text(genericErrorMessage))),
+            ),
       routes: {
         '/maisons': (context) => const MaisonsScreen(),
         '/quartiers': (context) => const QuartiersScreen(),
@@ -83,6 +94,13 @@ class MyApp extends ConsumerWidget {
               displayName: args['displayName'],
               email: args['email'],
             ),
+          );
+        }
+        // Handle certificat verification route
+        if (settings.name != null &&
+            settings.name!.startsWith('/certificat/verify/')) {
+          return MaterialPageRoute(
+            builder: (context) => const CertificatVerificationScreen(),
           );
         }
         return null;
